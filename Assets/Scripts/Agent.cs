@@ -14,7 +14,6 @@ public class Agent : MonoBehaviour
     [SerializeField] private NavMeshAgent m_navAgent;
     [SerializeField] private Workstation m_workstation;
     [SerializeField] private KitchenManager m_kitchenManager;
-    private bool m_isOrderBeingTaken = false;
 
 
     // ---- Methods ----
@@ -117,7 +116,7 @@ public class Agent : MonoBehaviour
         // 4️ Déposer l’ingrédient
         m_workstation.AddIngredient(m_agentMain);
         Debug.Log(m_agentName + " placed: " + m_agentMain.GetName() + " on workstation");
-        MoveTo(transform.position + new Vector3(Random.Range(-2f, 2f), 0, Random.Range(-2f, 2f))); // Légère variation de position pour éviter l’empilement
+        MoveTo(transform.position + new Vector3(Random.Range(-3f, 3f), 0, Random.Range(-3f, 3f))); // Légère variation de position pour éviter l’empilement
 
 
         m_agentMain = null;
@@ -146,6 +145,4 @@ public class Agent : MonoBehaviour
 
 
     public void AddMoney(int _amount) => m_money += _amount;
-    public bool IsOrderBeingTaken() => m_isOrderBeingTaken;
-    public void SetOrderBeingTaken(bool value) => m_isOrderBeingTaken = value;
 }
