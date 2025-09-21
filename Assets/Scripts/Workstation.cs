@@ -9,7 +9,7 @@ public class Workstation : MonoBehaviour
         m_placedIngredients.Add(_ingredient);
     }
 
-    public bool ValidateOrder(Order _order){ /// Valider la commande en cours
+    public bool ValidateOrder(Order _order){ /// Valider la commande en cours comment ça marche : la commande est validée si tous les ingrédients placés correspondent à la recette
         List<Ingredient> recipe = _order.GetRecipe();
 
         if (m_placedIngredients.Count != recipe.Count)

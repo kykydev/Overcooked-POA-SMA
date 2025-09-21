@@ -3,6 +3,7 @@ using UnityEngine;
 public class Ingredient
 {
     [SerializeField] private string m_ingredientName;
+    [SerializeField] private bool isTaken = false;
     [SerializeField] private IngredientContainer m_container;
 
     public Ingredient(string _name){ /// Constructor
@@ -12,9 +13,15 @@ public class Ingredient
     // ---- Methods ----
 
     public string GetName() => m_ingredientName;
+
     public IngredientContainer GetContainer() => m_container;
+
     public void SetContainer(IngredientContainer _container){
         m_container = _container;
     }
+
+    public bool IsTaken() => isTaken;
+
+    public void MarkAsTaken() => isTaken = true;
 
 }

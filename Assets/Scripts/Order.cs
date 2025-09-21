@@ -8,6 +8,7 @@ public class Order
     [SerializeField] private string m_orderId;
     [SerializeField] private List<Ingredient> m_recipe;
     [SerializeField] private int m_reward;
+    private List<bool> ingredientTaken;
 
     private OrderStatus m_status = OrderStatus.Pending;
 
@@ -22,4 +23,6 @@ public class Order
     public void SetRecipe(List<Ingredient> _newRecipe) => m_recipe = _newRecipe;
     public void SetReward(int _newReward) => m_reward = _newReward;
     public void SetStatus(OrderStatus _newStatus) => m_status = _newStatus;
+
+
 }
