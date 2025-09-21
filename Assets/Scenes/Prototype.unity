@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 580bbc456588b1d47935b434975bf909, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KitchenManager
-  m_agent: {fileID: 1249695703}
+  m_agent1: {fileID: 1249695703}
   m_counter: {fileID: 1447341927}
   m_tomatoContainer: {fileID: 559159064}
   m_saladContainer: {fileID: 843748854}
@@ -400,7 +400,7 @@ Transform:
   m_GameObject: {fileID: 559159059}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.15, y: 0.5, z: 3.58}
+  m_LocalPosition: {x: -1.15, y: 0.5, z: 1.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -536,7 +536,7 @@ Transform:
   m_GameObject: {fileID: 843748853}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.88, y: 0.5, z: 3.58}
+  m_LocalPosition: {x: 1.36, y: 0.5, z: 3.38}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -838,6 +838,7 @@ GameObject:
   - component: {fileID: 1249695698}
   - component: {fileID: 1249695703}
   - component: {fileID: 1249695702}
+  - component: {fileID: 1249695704}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
@@ -933,7 +934,7 @@ Transform:
   m_GameObject: {fileID: 1249695697}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: -1.21, y: 1, z: 3.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -978,6 +979,33 @@ MonoBehaviour:
   m_money: 0
   m_navAgent: {fileID: 1249695702}
   m_workstation: {fileID: 1785420458}
+--- !u!54 &1249695704
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249695697}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1447341926
 GameObject:
   m_ObjectHideFlags: 0
