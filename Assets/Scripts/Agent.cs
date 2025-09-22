@@ -82,7 +82,7 @@ public class Agent : MonoBehaviour
         m_navAgent.SetDestination(_counter.transform.position);
 
         // 2️ Attendre que l’agent soit proche
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 1.5f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 3f);
 
         // 3️ Récupérer la commande
         m_kitchenManager.SetCurrentOrder(_counter.GiveOrder());
@@ -103,7 +103,7 @@ public class Agent : MonoBehaviour
 
         // 1️ Se déplacer vers le bac
         MoveTo(container.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, container.transform.position) < 1.5f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, container.transform.position) < 3f);
 
         // 2️ Récupérer l’ingrédient
         m_agentMain = container.ProvideIngredient();
@@ -111,7 +111,7 @@ public class Agent : MonoBehaviour
 
         // 3️ Se déplacer vers la workstation
         MoveTo(m_workstation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_workstation.transform.position) < 2f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_workstation.transform.position) < 3f);
 
         // 4️ Déposer l’ingrédient
         m_workstation.AddIngredient(m_agentMain);
@@ -132,7 +132,7 @@ public class Agent : MonoBehaviour
         MoveTo(_counter.transform.position);
 
         // 2️ Attendre que l’agent arrive à proximité
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 1.5f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 3f);
 
         // 3️ Livrer la commande
         _counter.ReceiveOrder(currentOrder, this, m_workstation);
