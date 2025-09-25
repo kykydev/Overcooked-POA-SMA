@@ -3,20 +3,28 @@ using UnityEngine;
 
 public class Counter : MonoBehaviour
 {
+    /// --- Attributes ---
     private Queue<Order> m_orders = new Queue<Order>();
 
-    // ---- Methods ----
-
-    public Order GiveOrder(){ /// Fournir la prochaine commande dans la file d’attente au client
-        if (m_orders.Count == 0) return null;
+    /// --- Methods ---
+    //Retourne la prochaine commande dans la file d’attente
+    public Order GiveOrder()
+    {
         return m_orders.Dequeue();
     }
 
-    public void ReceiveOrder(Order _order, Agent _agent, Workstation _workstation){ /// Recevoir une commande complétée
+    //Ajouter une nouvelle commande à la file d’attente
+    public void AddOrder(Order _newOrder)
+    {
+        m_orders.Enqueue(_newOrder);
+    }
+
+    //Recevoir une commande d’un agent et la valider via une workstation
+    public void ReceiveOrder(Order _order, Workstation _workstation)
+    {
         if (_workstation.ValidateOrder(_order))
         {
             _order.SetStatus(OrderStatus.Delivered);
-            _agent.AddMoney(_order.GetReward());
             _workstation.ClearStation();
 
             Debug.Log("Order delivered successfully!");
@@ -26,6 +34,4 @@ public class Counter : MonoBehaviour
             Debug.LogWarning("Order incorrect or incomplete!");
         }
     }
-
-    public void AddOrder(Order _newOrder) => m_orders.Enqueue(_newOrder); /// Ajouter une nouvelle commande à la file d’attente
 }

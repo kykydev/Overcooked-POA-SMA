@@ -2,16 +2,15 @@ using UnityEngine;
 
 public class IngredientContainer : MonoBehaviour
 {
-    //[SerializeField] private Transform m_pickupPoint;
-    [SerializeField] private Ingredient m_ingredient;
+    /// --- Attributes ---
+    private Ingredient m_ingredient;
 
-    // ---- Methods ----
+    /// --- Getters ---
+    public Ingredient GetIngredient() => m_ingredient;
 
-    public Ingredient ProvideIngredient(){ /// Fournir l’ingrédient contenu dans le container
-        return m_ingredient;
-    }
-
-    public void SetIngredient(Ingredient _ingredient){ /// Définir l’ingrédient contenu dans le container
+    /// --- Setters ---
+    public void SetIngredient(Ingredient _ingredient){
         m_ingredient = _ingredient;
+        m_ingredient.SetContainer(this);
     }
 }

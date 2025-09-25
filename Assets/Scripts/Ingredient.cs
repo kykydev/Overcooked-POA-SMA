@@ -2,26 +2,21 @@ using UnityEngine;
 
 public class Ingredient
 {
-    [SerializeField] private string m_ingredientName;
-    [SerializeField] private bool isTaken = false;
-    [SerializeField] private IngredientContainer m_container;
+    /// --- Attributes ---
+    private string m_ingredientName;
+    private IngredientContainer m_container;
 
-    public Ingredient(string _name){ /// Constructor
+    /// --- Constructor ---
+    public Ingredient(string _name)
+    {
         m_ingredientName = _name;
     }
 
-    // ---- Methods ----
-
+    /// --- Getters ---
+    public IngredientContainer GetContainer() => m_container;
     public string GetName() => m_ingredientName;
 
-    public IngredientContainer GetContainer() => m_container;
-
-    public void SetContainer(IngredientContainer _container){
-        m_container = _container;
-    }
-
-    public bool IsTaken() => isTaken;
-
-    public void MarkAsTaken() => isTaken = true;
-
+    /// --- Setters ---
+    public void SetContainer(IngredientContainer _container) => m_container = _container;
+    public void SetIngredientName(string _name) => m_ingredientName = _name;
 }
