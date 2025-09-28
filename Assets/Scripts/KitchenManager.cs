@@ -9,15 +9,16 @@ public class KitchenManager : MonoBehaviour
 
     [SerializeField] private Counter m_counter;
 
-    [SerializeField] private IngredientContainer m_tomatoContainer;
-    [SerializeField] private IngredientContainer m_saladContainer;
-    [SerializeField] private IngredientContainer m_breadContainer;
-    [SerializeField] private IngredientContainer m_steakContainer;
+    [SerializeField] private IngredientStation m_tomatoContainer;
+    [SerializeField] private IngredientStation m_saladContainer;
+    [SerializeField] private IngredientStation m_breadContainer;
+    [SerializeField] private IngredientStation m_steakContainer;
 
-    [SerializeField] private Workstation m_workstation;
+    [SerializeField] private AssemblyStation m_assemblyStation;
+    [SerializeField] private CookingStation m_cookingStation;
+    [SerializeField] private CuttingStation m_cuttingStation;
 
     [SerializeField] private DishManager m_dishManager;
-    [SerializeField] private IngredientManager m_ingredientManager;
 
     private Order m_currentOrder;
     private bool m_isOrderBeingTaken = false;
@@ -35,6 +36,7 @@ public class KitchenManager : MonoBehaviour
 
     /// --- Getters ---
     public Order GetCurrentOrder() => m_currentOrder;
+    public Queue<Ingredient> GetIngredientQueue() => m_ingredientQueue;
 
     public Ingredient GetCurrentIngredient()
     {
@@ -53,17 +55,34 @@ public class KitchenManager : MonoBehaviour
             var ingredientQueue = new Queue<Ingredient>();
             foreach (Ingredient proto in _order.GetDish().GetRecipe())
             {
-                //Clone l'ingrédient pour cette commande
-                Ingredient ing = new Ingredient(proto.GetName());
-                //Associe le bon container (si tu veux garder cette logique)
-                if (proto.GetName() == "Tomato") ing.SetContainer(m_tomatoContainer);
-                else if (proto.GetName() == "Salad") ing.SetContainer(m_saladContainer);
-                else if (proto.GetName() == "Bread") ing.SetContainer(m_breadContainer);
-                else if (proto.GetName() == "Steak") ing.SetContainer(m_steakContainer);
+                // Clone l'ingrédient pour cette commande
+                Ingredient ing = new Ingredient(proto.GetName(), proto.GetNeedsCooking(), proto.GetNeedsCutting());
+
+                if (proto.GetName() == "Tomato")
+                {
+                    ing.SetContainer(m_tomatoContainer);
+                    m_tomatoContainer.SetIngredient(ing);
+                }
+                else if (proto.GetName() == "Salad")
+                {
+                    ing.SetContainer(m_saladContainer);
+                    m_saladContainer.SetIngredient(ing);
+                }
+                else if (proto.GetName() == "Bread")
+                {
+                    ing.SetContainer(m_breadContainer);
+                    m_breadContainer.SetIngredient(ing);
+                }
+                else if (proto.GetName() == "Steak")
+                {
+                    ing.SetContainer(m_steakContainer);
+                    m_steakContainer.SetIngredient(ing);
+                }
 
                 ingredientQueue.Enqueue(ing);
             }
             m_ingredientQueue = ingredientQueue;
+
         }
         else
         {
@@ -74,12 +93,6 @@ public class KitchenManager : MonoBehaviour
     /// --- Methods ---
     void Start()
     {
-        //Initialiser les IngredientContainer avec leur ingrédient unique
-        m_tomatoContainer.SetIngredient(m_ingredientManager.Tomato);
-        m_saladContainer.SetIngredient(m_ingredientManager.Salad);
-        m_breadContainer.SetIngredient(m_ingredientManager.Bread);
-        m_steakContainer.SetIngredient(m_ingredientManager.Steak);
-
 
         //Récupérer 10 plats aléatoires
         List<Dish> randomDishes = m_dishManager.GetRandomDishes(10);
@@ -99,7 +112,9 @@ public class KitchenManager : MonoBehaviour
         foreach (Agent agent in m_agents)
         {
             agent.SetAgentID(j);
-            agent.SetWorkstation(m_workstation);
+            agent.SetAssemblyStation(m_assemblyStation);
+            agent.SetCookingStation(m_cookingStation);
+            agent.SetCuttingStation(m_cuttingStation);
             agent.Work(m_counter);
             j++;
         }

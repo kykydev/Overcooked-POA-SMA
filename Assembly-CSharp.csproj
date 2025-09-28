@@ -62,11 +62,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Dish.cs" />
-    <Compile Include="Assets\Scripts\IngredientManager.cs" />
-    <Compile Include="Assets\Scripts\Workstation.cs" />
+    <Compile Include="Assets\Scripts\CookingStation.cs" />
     <Compile Include="Assets\Scripts\Agent.cs" />
+    <Compile Include="Assets\Scripts\AssemblyStation.cs" />
     <Compile Include="Assets\Scripts\Counter.cs" />
+    <Compile Include="Assets\Scripts\CuttingStation.cs" />
     <Compile Include="Assets\Scripts\KitchenManager.cs" />
+    <Compile Include="Assets\Scripts\WorkStation.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\DishManager.cs" />
     <Compile Include="Assets\Scripts\Ingredient.cs" />

@@ -12,7 +12,9 @@ public class Agent : MonoBehaviour
     private string m_agentName;
     private Ingredient m_agentMain;
 
-    private Workstation m_workstation;
+    private AssemblyStation m_assemblyStation;
+    private CookingStation m_cookingStation;
+    private CuttingStation m_cuttingStation;
 
     [SerializeField] private NavMeshAgent m_navAgent;
     [SerializeField] private KitchenManager m_kitchenManager;
@@ -26,7 +28,9 @@ public class Agent : MonoBehaviour
     public void SetAgentID(int _id) => m_agentID = _id;
     public void SetAgentName(string _name) => m_agentName = _name;
     public void SetAgentMain(Ingredient _main) => m_agentMain = _main;
-    public void SetWorkstation(Workstation _workstation) => m_workstation = _workstation;
+    public void SetAssemblyStation(AssemblyStation _assemblyStation) => m_assemblyStation = _assemblyStation;
+    public void SetCookingStation(CookingStation _cookingStation) => m_cookingStation = _cookingStation;
+    public void SetCuttingStation(CuttingStation _cuttingStation) => m_cuttingStation = _cuttingStation;
 
 
     /// ---- Methods ----
@@ -67,8 +71,8 @@ public class Agent : MonoBehaviour
                     nextIngredient = m_kitchenManager.GetCurrentIngredient();
                 }
 
-                //Déposer la commande si tous les ingrédients sont sur la workstation
-                if (m_workstation.ValidateOrder(m_kitchenManager.GetCurrentOrder()))
+                //Déposer la commande si tous les ingrédients sont sur la workstation d'assemblage
+                if (m_assemblyStation.ValidateOrder(m_kitchenManager.GetCurrentOrder()))
                 {
                     if (!m_kitchenManager.IsOrderBeingDelivered())
                     {
@@ -117,7 +121,7 @@ public class Agent : MonoBehaviour
         if (_ingredient == null)
             yield break;
 
-        IngredientContainer container = _ingredient.GetContainer();
+        WorkStation container = _ingredient.GetContainer();
         if (container == null)
             yield break;
 
@@ -126,17 +130,46 @@ public class Agent : MonoBehaviour
         yield return new WaitUntil(() => Vector3.Distance(transform.position, container.transform.position) < 2f);
 
         //Récupérer l’ingrédient
-        m_agentMain = container.GetIngredient();
+        if (container is IngredientStation station)
+        {
+            m_agentMain = station.GetIngredient();
+        }
+
+        if (container is CookingStation cooking)
+        {
+            m_agentMain = cooking.GetIngredient();
+        }
+
         Debug.Log(m_agentID + " picked up: " + m_agentMain.GetName());
 
-        //Se déplacer vers la workstation
-        MoveTo(m_workstation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_workstation.transform.position) < 2f);
+        //Si l’ingrédient nécessite une cuisson, se déplacer vers la workstation de cuisson pour y déposer l’ingrédient
+        if (m_agentMain.NeedsCooking())
+        {
+            MoveTo(m_cookingStation.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_cookingStation.transform.position) < 2f);
+            m_cookingStation.StartCoroutine(m_cookingStation.CookIngredient(m_agentMain));
+            MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); //Je bouge l'agent pour pas tout casser
+            yield break;
+        }
 
-        //Déposer l’ingrédient
-        m_workstation.AddIngredient(m_agentMain);
-        Debug.Log(m_agentID + " placed: " + m_agentMain.GetName() + " on workstation");
-        MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); // Légère variation de position pour éviter l’empilement
+        //Si l’ingrédient nécessite une découpe, se déplacer vers la workstation de découpe pour y déposer l’ingrédient
+        if (m_agentMain.NeedsCutting())
+        {
+            MoveTo(m_cuttingStation.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_cuttingStation.transform.position) < 2f);
+            yield return StartCoroutine(m_cuttingStation.CutIngredient(m_agentMain));
+            MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); //Je bouge l'agent pour pas tout casser
+        }
+
+
+        //Se déplacer vers la workstation d’assemblage
+        MoveTo(m_assemblyStation.transform.position);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_assemblyStation.transform.position) < 2f);
+
+        //Déposer l’ingrédient sur la workstation d’assemblage
+        m_assemblyStation.AddIngredient(m_agentMain);
+        Debug.Log(m_agentID + " placed: " + m_agentMain.GetName() + " on assemblyStation");
+        MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); //Je bouge l'agent pour pas tout casser
 
 
         m_agentMain = null;
@@ -155,11 +188,11 @@ public class Agent : MonoBehaviour
         yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 2f);
 
         //Livrer la commande
-        _counter.ReceiveOrder(currentOrder, m_workstation);
+        _counter.ReceiveOrder(currentOrder, m_assemblyStation);
         Debug.Log(m_agentID + " delivered order: " + currentOrder.GetOrderId());
 
         //Nettoyer la commande dans le KitchenManager
-        m_workstation.ClearStation();
+        m_assemblyStation.ClearStation();
         m_kitchenManager.ClearCurrentOrder();
     }
 }

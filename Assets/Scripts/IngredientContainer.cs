@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class IngredientContainer : MonoBehaviour
+public class IngredientStation : WorkStation
 {
     /// --- Attributes ---
     private Ingredient m_ingredient;
@@ -13,4 +13,6 @@ public class IngredientContainer : MonoBehaviour
         m_ingredient = _ingredient;
         m_ingredient.SetContainer(this);
     }
+
+
 }

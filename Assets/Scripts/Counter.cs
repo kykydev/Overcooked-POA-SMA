@@ -19,15 +19,13 @@ public class Counter : MonoBehaviour
         m_orders.Enqueue(_newOrder);
     }
 
-    //Recevoir une commande d’un agent et la valider via une workstation
-    public void ReceiveOrder(Order _order, Workstation _workstation)
+    //Recevoir une commande d’un agent et la valider via une workstation d'assemblage
+    public void ReceiveOrder(Order _order, AssemblyStation _assemblyStation)
     {
-        if (_workstation.ValidateOrder(_order))
+        if (_assemblyStation.ValidateOrder(_order))
         {
             _order.SetStatus(OrderStatus.Delivered);
-            _workstation.ClearStation();
-
-            Debug.Log("Order delivered successfully!");
+            _assemblyStation.ClearStation();
         }
         else
         {
