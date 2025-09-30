@@ -13,20 +13,25 @@ public class DishManager : MonoBehaviour
                 new Ingredient("Steak", true, true),
                 new Ingredient("Tomato", false, true),
                 new Ingredient("Salad", false, true),
-                new Ingredient("Bread", false, false)
+                new Ingredient("Bread", false, false),
+                new Ingredient("Onion", false, true)
+
             }),
-            new Dish("Salad", new List<Ingredient> {
-                new Ingredient("Tomato", false, true),
-                new Ingredient("Salad", false, true)
-            }),
-            new Dish("VeganBurger", new List<Ingredient> {
-                new Ingredient("Tomato", false, true),
-                new Ingredient("Salad", false, true),
-                new Ingredient("Bread", false, false)
-            }),
-            new Dish("Steak", new List<Ingredient> {
-                new Ingredient("Steak", true, true)
-            })
+            // new Dish("Salad", new List<Ingredient> {
+            //     new Ingredient("Tomato", false, true),
+            //     new Ingredient("Salad", false, true),
+            //     new Ingredient("Onion", false, true)
+
+            // }),
+            // new Dish("VeganBurger", new List<Ingredient> {
+            //     new Ingredient("Tomato", false, true),
+            //     new Ingredient("Salad", false, true),
+            //     new Ingredient("Bread", false, false),
+            //     new Ingredient("Onion", false, true)
+            // }),
+            // new Dish("Steak", new List<Ingredient> {
+            //     new Ingredient("Steak", true, true)
+            // })
         };
     }
 
