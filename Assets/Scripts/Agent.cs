@@ -18,7 +18,7 @@ public class Agent : MonoBehaviour
 
     [SerializeField] private NavMeshAgent m_navAgent;
     [SerializeField] private KitchenManager m_kitchenManager;
-
+    
     /// ---- Getters ----
     public int GetAgentID() => m_agentID;
     public string GetAgentName() => m_agentName;
@@ -133,11 +133,14 @@ public class Agent : MonoBehaviour
         if (container is IngredientStation station)
         {
             m_agentMain = station.GetIngredient();
+            ShowIngredientInHand();
         }
 
         if (container is CookingStation cooking)
         {
             m_agentMain = cooking.GetIngredient();
+            ShowIngredientInHand();
+
         }
 
         Debug.Log(m_agentID + " picked up: " + m_agentMain.GetName());
@@ -147,7 +150,12 @@ public class Agent : MonoBehaviour
         {
             MoveTo(m_cookingStation.transform.position);
             yield return new WaitUntil(() => Vector3.Distance(transform.position, m_cookingStation.transform.position) < 2f);
+
+            m_cookingStation.ShowIngredientOnStation(m_agentMain); // <-- Ajoute cette ligne
             m_cookingStation.StartCoroutine(m_cookingStation.CookIngredient(m_agentMain));
+            
+            m_agentMain = null;
+            ShowIngredientInHand();
             MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); //Je bouge l'agent pour pas tout casser
             yield break;
         }
@@ -173,6 +181,7 @@ public class Agent : MonoBehaviour
 
 
         m_agentMain = null;
+        ShowIngredientInHand();
     }
 
     private IEnumerator DeliverOrderRoutine(Counter _counter)
@@ -195,4 +204,27 @@ public class Agent : MonoBehaviour
         m_assemblyStation.ClearStation();
         m_kitchenManager.ClearCurrentOrder();
     }
+
+// ...existing code...
+
+    public void ShowIngredientInHand()
+    {
+        Transform handTransform = transform.Find("Hand");
+        if (handTransform == null)
+            return;
+
+        // Détruit tout ce qu'il y a dans la main
+        foreach (Transform child in handTransform)
+            GameObject.Destroy(child.gameObject);
+
+        // Si l'agent a un ingrédient, affiche-le
+        if (m_agentMain != null && m_agentMain.GetPrefab() != null)
+        {
+            GameObject ingredientObj = GameObject.Instantiate(m_agentMain.GetPrefab(), handTransform);
+            ingredientObj.transform.localPosition = Vector3.zero;
+            ingredientObj.transform.localRotation = Quaternion.identity;
+        }
+    }
+
+// ...appelle ShowIngredientInHand() juste après avoir récupéré un ingrédient dans FetchIngredientRoutine...
 }

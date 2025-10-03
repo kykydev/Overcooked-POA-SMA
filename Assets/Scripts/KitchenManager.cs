@@ -57,7 +57,7 @@ public class KitchenManager : MonoBehaviour
             foreach (Ingredient proto in _order.GetDish().GetRecipe())
             {
                 // Clone l'ingrédient pour cette commande
-                Ingredient ing = new Ingredient(proto.GetName(), proto.GetNeedsCooking(), proto.GetNeedsCutting());
+                Ingredient ing = new Ingredient(proto.GetName(), proto.GetNeedsCooking(), proto.GetNeedsCutting(), proto.GetPrefab());
 
                 if (proto.GetName() == "Tomato")
                 {

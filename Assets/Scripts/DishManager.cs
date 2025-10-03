@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class DishManager : MonoBehaviour
 {
+    public GameObject steakPrefab;
+    public GameObject tomatoPrefab;
+    public GameObject saladPrefab;
+    public GameObject breadPrefab;
+    public GameObject onionPrefab;
+
     private List<Dish> m_allDishes;
 
     void Awake()
@@ -10,11 +16,11 @@ public class DishManager : MonoBehaviour
         m_allDishes = new List<Dish>
         {
             new Dish("Burger", new List<Ingredient> {
-                new Ingredient("Steak", true, true),
-                new Ingredient("Tomato", false, true),
-                new Ingredient("Salad", false, true),
-                new Ingredient("Bread", false, false),
-                new Ingredient("Onion", false, true)
+                new Ingredient("Steak", true, true, steakPrefab),
+                new Ingredient("Tomato", false, true, tomatoPrefab),
+                new Ingredient("Salad", false, true, saladPrefab),
+                new Ingredient("Bread", false, false, breadPrefab),
+                new Ingredient("Onion", false, true, onionPrefab)
 
             }),
             // new Dish("Salad", new List<Ingredient> {

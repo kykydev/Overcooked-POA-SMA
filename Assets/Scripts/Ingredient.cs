@@ -13,13 +13,16 @@ public class Ingredient
     private bool m_needsCooking = false;
     private bool m_needsCutting = false;
     private WorkStation m_container;
+    private GameObject m_prefab;
 
     /// --- Constructor ---
-    public Ingredient(string _name, bool _needsCooking, bool _needsCutting)
+    public Ingredient(string _name, bool _needsCooking, bool _needsCutting, GameObject _prefab)
     {
         m_ingredientName = _name;
         m_needsCooking = _needsCooking;
         m_needsCutting = _needsCutting;
+        m_prefab = _prefab;
+
     }
 
     /// --- Getters ---
@@ -29,6 +32,7 @@ public class Ingredient
     public bool GetNeedsCooking() => m_needsCooking;
     public IngredientCuttingState GetCuttingState() => m_cuttingState;
     public bool GetNeedsCutting() => m_needsCutting;
+    public GameObject GetPrefab() => m_prefab;
 
     /// --- Setters ---
     public void SetContainer(WorkStation _container) => m_container = _container;
