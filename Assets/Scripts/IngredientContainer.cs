@@ -1,16 +1,20 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class IngredientStation : WorkStation
 {
-    /// --- Attributes ---
-    private Ingredient m_ingredient;
+    private Queue<Ingredient> m_ingredients = new Queue<Ingredient>();
 
-    /// --- Getters ---
-    public Ingredient GetIngredient() => m_ingredient;
+    public Ingredient GetIngredient()
+    {
+        if (m_ingredients.Count == 0)
+            return null;
+        return m_ingredients.Dequeue();
+    }
 
-    /// --- Setters ---
-    public void SetIngredient(Ingredient _ingredient){
-        m_ingredient = _ingredient;
-        m_ingredient.SetContainer(this);
+    public void SetIngredient(Ingredient _ingredient)
+    {
+        m_ingredients.Enqueue(_ingredient);
+        _ingredient.SetContainer(this);
     }
 }

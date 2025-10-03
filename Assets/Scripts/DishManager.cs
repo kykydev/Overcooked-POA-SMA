@@ -19,7 +19,7 @@ public class DishManager : MonoBehaviour
     {
         m_allDishes = new List<Dish>
         {
-            new Dish("Burger", new List<Ingredient> {
+            new Dish("CheeseBurger", new List<Ingredient> {
                 new Ingredient("Steak", true, true, m_steakPrefab),
                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
                 new Ingredient("Salad", false, true, m_saladPrefab),
@@ -41,6 +41,15 @@ public class DishManager : MonoBehaviour
              }),
              new Dish("Steak", new List<Ingredient> {
                  new Ingredient("Steak", true, true, m_steakPrefab)
+             }),
+             new Dish ("DoubleCheeseBurger", new List<Ingredient> {
+                 new Ingredient("Steak", true, true, m_steakPrefab),
+                 new Ingredient("Steak", true, true, m_steakPrefab),
+                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Bread", false, false, m_breadPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab),
+                 new Ingredient("Cheese", false, true, m_cheesePrefab)
              })
         };
     }

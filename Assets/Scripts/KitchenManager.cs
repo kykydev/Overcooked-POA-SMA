@@ -17,8 +17,8 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private IngredientStation m_cheeseContainer;
 
     [SerializeField] private AssemblyStation m_assemblyStation;
-    [SerializeField] private CookingStation m_cookingStation;
-    [SerializeField] private CuttingStation m_cuttingStation;
+    [SerializeField] private List<CookingStation> m_cookingStation;
+    [SerializeField] private List<CuttingStation> m_cuttingStation;
 
     [SerializeField] private DishManager m_dishManager;
 
