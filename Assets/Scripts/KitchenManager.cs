@@ -14,6 +14,7 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private IngredientStation m_breadContainer;
     [SerializeField] private IngredientStation m_steakContainer;
     [SerializeField] private IngredientStation m_onionContainer;
+    [SerializeField] private IngredientStation m_cheeseContainer;
 
     [SerializeField] private AssemblyStation m_assemblyStation;
     [SerializeField] private CookingStation m_cookingStation;
@@ -84,7 +85,11 @@ public class KitchenManager : MonoBehaviour
                     ing.SetContainer(m_onionContainer);
                     m_onionContainer.SetIngredient(ing);
                 }
-
+                else if (proto.GetName() == "Cheese")
+                {
+                    ing.SetContainer(m_cheeseContainer);
+                    m_cheeseContainer.SetIngredient(ing);
+                }
                 ingredientQueue.Enqueue(ing);
             }
             m_ingredientQueue = ingredientQueue;
