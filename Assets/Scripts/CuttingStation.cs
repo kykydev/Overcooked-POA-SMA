@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class CuttingStation : WorkStation
 {
+
+    /// --- Methods ---
     public IEnumerator CutIngredient(Ingredient _ingredient)
     {
         m_placedIngredients.Add(_ingredient);

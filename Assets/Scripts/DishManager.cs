@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class DishManager : MonoBehaviour
 {
+
+    /// --- Attributes ---
     public GameObject m_steakPrefab;
     public GameObject m_tomatoPrefab;
     public GameObject m_saladPrefab;
@@ -12,6 +14,7 @@ public class DishManager : MonoBehaviour
 
     private List<Dish> m_allDishes;
 
+    /// --- Methods ---
     void Awake()
     {
         m_allDishes = new List<Dish>
@@ -24,21 +27,21 @@ public class DishManager : MonoBehaviour
                 new Ingredient("Onion", false, true, m_onionPrefab),
                 new Ingredient("Cheese", false, true, m_cheesePrefab)
             }),
-            // new Dish("Salad", new List<Ingredient> {
-            //     new Ingredient("Tomato", false, true),
-            //     new Ingredient("Salad", false, true),
-            //     new Ingredient("Onion", false, true)
+             new Dish("Salad", new List<Ingredient> {
+                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab)
 
-            // }),
-            // new Dish("VeganBurger", new List<Ingredient> {
-            //     new Ingredient("Tomato", false, true),
-            //     new Ingredient("Salad", false, true),
-            //     new Ingredient("Bread", false, false),
-            //     new Ingredient("Onion", false, true)
-            // }),
-            // new Dish("Steak", new List<Ingredient> {
-            //     new Ingredient("Steak", true, true)
-            // })
+             }),
+             new Dish("VeganBurger", new List<Ingredient> {
+                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Bread", false, false, m_breadPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab)
+             }),
+             new Dish("Steak", new List<Ingredient> {
+                 new Ingredient("Steak", true, true, m_steakPrefab)
+             })
         };
     }
 

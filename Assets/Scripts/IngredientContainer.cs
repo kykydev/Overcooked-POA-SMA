@@ -13,6 +13,4 @@ public class IngredientStation : WorkStation
         m_ingredient = _ingredient;
         m_ingredient.SetContainer(this);
     }
-
-
 }

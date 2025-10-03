@@ -123,6 +123,7 @@ public class KitchenManager : MonoBehaviour
         foreach (Agent agent in m_agents)
         {
             agent.SetAgentID(j);
+            agent.SetKitchenManager(this);
             agent.SetAssemblyStation(m_assemblyStation);
             agent.SetCookingStation(m_cookingStation);
             agent.SetCuttingStation(m_cuttingStation);

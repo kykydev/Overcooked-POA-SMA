@@ -17,7 +17,7 @@ public class Agent : MonoBehaviour
     private CuttingStation m_cuttingStation;
 
     [SerializeField] private NavMeshAgent m_navAgent;
-    [SerializeField] private KitchenManager m_kitchenManager;
+    private KitchenManager m_kitchenManager;
     
     /// ---- Getters ----
     public int GetAgentID() => m_agentID;
@@ -31,6 +31,7 @@ public class Agent : MonoBehaviour
     public void SetAssemblyStation(AssemblyStation _assemblyStation) => m_assemblyStation = _assemblyStation;
     public void SetCookingStation(CookingStation _cookingStation) => m_cookingStation = _cookingStation;
     public void SetCuttingStation(CuttingStation _cuttingStation) => m_cuttingStation = _cuttingStation;
+    public void SetKitchenManager(KitchenManager _kitchenManager) => m_kitchenManager = _kitchenManager;
 
 
     /// ---- Methods ----
