@@ -11,7 +11,7 @@ public class Agent : MonoBehaviour
     /// --- Attributes ---
     private int m_agentID;
     private string m_agentName;
-    private Ingredient m_agentMain;
+    private object m_agentMain;
 
     private AssemblyStation m_assemblyStation;
     private List<CookingStation> m_cookingStation;
@@ -23,12 +23,12 @@ public class Agent : MonoBehaviour
     /// ---- Getters ----
     public int GetAgentID() => m_agentID;
     public string GetAgentName() => m_agentName;
-    public Ingredient GetAgentMain() => m_agentMain;
+    public object GetAgentMain() => m_agentMain;
 
     /// ---- Setters ----
     public void SetAgentID(int _id) => m_agentID = _id;
-    public void SetAgentName(string _name) => m_agentName = _name;
-    public void SetAgentMain(Ingredient _main) => m_agentMain = _main;
+    public void SetAgentName(string _name) => m_agentName = _name;  
+    public void SetAgentMain(object _main) => m_agentMain = _main;
     public void SetAssemblyStation(AssemblyStation _assemblyStation) => m_assemblyStation = _assemblyStation;
     public void SetCookingStation(List<CookingStation> _cookingStation) => m_cookingStation = _cookingStation;
     public void SetCuttingStation(List<CuttingStation> _cuttingStation) => m_cuttingStation = _cuttingStation;
@@ -43,11 +43,17 @@ public class Agent : MonoBehaviour
         m_navAgent.SetDestination(_direction);
     }
 
+
+
+
     // Lancer la routine de travail
     public void Work(Counter _counter)
     {
         StartCoroutine(WorkRoutine(_counter));
     }
+
+
+
 
     private IEnumerator WorkRoutine(Counter _counter)
     {
@@ -73,15 +79,15 @@ public class Agent : MonoBehaviour
                     nextIngredient = m_kitchenManager.GetCurrentIngredient();
                 }
 
-                //Déposer la commande si tous les ingrédients sont sur la workstation d'assemblage
-                if (m_assemblyStation.ValidateOrder(m_kitchenManager.GetCurrentOrder()))
+                // Si l'agent porte un plat, il livre la commande
+                if (m_agentMain is Dish)
                 {
                     if (!m_kitchenManager.IsOrderBeingDelivered())
                     {
                         m_kitchenManager.SetOrderBeingDelivered(true);
-                        
+
                         yield return StartCoroutine(DeliverOrderRoutine(_counter));
-                       
+
                         m_kitchenManager.SetOrderBeingTaken(true);
                         yield return StartCoroutine(TakeOrderRoutine(_counter));
                         m_kitchenManager.SetOrderBeingTaken(false);
@@ -95,6 +101,7 @@ public class Agent : MonoBehaviour
             yield return null;
         }
     }
+
 
 
 
@@ -113,9 +120,12 @@ public class Agent : MonoBehaviour
         if (m_kitchenManager.GetCurrentOrder() != null)
         {
             m_kitchenManager.GetCurrentOrder().SetStatus(OrderStatus.Preparing);
-            Debug.Log(m_agentID + " took order " + m_kitchenManager.GetCurrentOrder().GetOrderId());
+            Debug.Log(m_agentID + " took order: " + m_kitchenManager.GetCurrentOrder().GetOrderId());
         }
     }
+
+
+
 
     // Récupération d’un ingrédient et dépose sur la workstation
     private IEnumerator FetchIngredientRoutine(Ingredient _ingredient)
@@ -133,86 +143,105 @@ public class Agent : MonoBehaviour
 
         //Récupérer l’ingrédient
         if (container is IngredientStation station)
-        {
             m_agentMain = station.GetIngredient();
-            ShowIngredientInHand();
-        }
-
-        if (container is CookingStation cooking)
-        {
+        else if (container is CookingStation cooking)
             m_agentMain = cooking.GetIngredient();
-            ShowIngredientInHand();
 
-        }
+        ShowIngredientInHand();
 
-        Debug.Log(m_agentID + " picked up: " + m_agentMain.GetName());
 
-        //Si l’ingrédient nécessite une cuisson, se déplacer vers la workstation de cuisson pour y déposer l’ingrédient
-        if (m_agentMain.NeedsCooking())
+        if (m_agentMain is Ingredient ingredient)
         {
-            var nearestCooking = FindNearestAvailableStation(m_cookingStation);
-            if (nearestCooking == null)
-                yield break; // aucune station dispo
+            Debug.Log(m_agentID + " picked up: " + ingredient.GetName());
 
-            nearestCooking.LockStation();
+            //Vérifier si l’ingrédient doit être cuit
+            if (ingredient.NeedsCooking())
+            {
+                var nearestCooking = FindNearestAvailableStation(m_cookingStation);
+                if (nearestCooking == null)
+                    yield break;
 
-            MoveTo(nearestCooking.transform.position);
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCooking.transform.position) < 2f);
+                nearestCooking.LockStation();
 
-            nearestCooking.ShowIngredientOnStation(m_agentMain);
-            nearestCooking.StartCoroutine(nearestCooking.CookIngredient(m_agentMain));
+                MoveTo(nearestCooking.transform.position);
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCooking.transform.position) < 2f);
 
-            m_agentMain = null;
-            ShowIngredientInHand();
+                nearestCooking.ShowIngredientOnStation(ingredient);
+                nearestCooking.StartCoroutine(nearestCooking.CookIngredient(ingredient));
 
-            nearestCooking.UnlockStation();
+                Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cookingStation");
+                m_agentMain = null;
+                ShowIngredientInHand();
 
-            MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
-            yield break;
+                nearestCooking.UnlockStation();
+
+                MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
+                yield break;
+            }
+
+            //Vérifier si l’ingrédient doit être coupé
+            if (ingredient.NeedsCutting())
+            {
+                var nearestCutting = FindNearestAvailableStation(m_cuttingStation);
+                if (nearestCutting == null)
+                    yield break;
+
+                nearestCutting.LockStation();
+
+                MoveTo(nearestCutting.transform.position);
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCutting.transform.position) < 2f);
+
+                nearestCutting.ShowIngredientOnStation(ingredient);
+                m_agentMain = null;
+                ShowIngredientInHand();
+                Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cuttingStation");
+                Debug.Log(m_agentID + " cutting: " + ingredient.GetName());
+
+                yield return StartCoroutine(nearestCutting.CutIngredient(ingredient));
+                Debug.Log(m_agentID + " has cut: " + ingredient.GetName());
+                m_agentMain = nearestCutting.GetIngredient();
+                ShowIngredientInHand();
+
+                nearestCutting.UnlockStation();
+
+                MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
+            }
         }
-
-
-        //Si l’ingrédient nécessite une découpe, se déplacer vers la workstation de découpe pour y déposer l’ingrédient
-        if (m_agentMain.NeedsCutting())
+        else
         {
-            var nearestCutting = FindNearestAvailableStation(m_cuttingStation);
-            if (nearestCutting == null)
-                yield break; // aucune station dispo
-
-            nearestCutting.LockStation();
-
-            MoveTo(nearestCutting.transform.position);
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCutting.transform.position) < 2f);
-
-            var ingredientToCut = m_agentMain;
-            nearestCutting.ShowIngredientOnStation(ingredientToCut);
-            m_agentMain = null;
-            ShowIngredientInHand();
-
-            yield return StartCoroutine(nearestCutting.CutIngredient(ingredientToCut));
-            m_agentMain = nearestCutting.GetIngredient();
-            ShowIngredientInHand();
-
-            nearestCutting.UnlockStation();
-
-            MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
+            Debug.Log(m_agentID + " picked up: " + m_agentMain?.GetType().Name);
         }
-
 
 
         //Se déplacer vers la workstation d’assemblage
         MoveTo(m_assemblyStation.transform.position);
         yield return new WaitUntil(() => Vector3.Distance(transform.position, m_assemblyStation.transform.position) < 2f);
 
-        //Déposer l’ingrédient sur la workstation d’assemblage
-        m_assemblyStation.AddIngredient(m_agentMain);
-        Debug.Log(m_agentID + " placed: " + m_agentMain.GetName() + " on assemblyStation");
-        MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f))); //Je bouge l'agent pour pas tout casser
+        //Déposer l’objet sur la workstation d’assemblage
+        if (m_agentMain is Ingredient ingredientToPlace)
+        {
+            m_assemblyStation.AddIngredient(ingredientToPlace);
+            m_agentMain = null;
+            ShowIngredientInHand();
+            Debug.Log(m_agentID + " placed: " + ingredientToPlace.GetName() + " on assemblyStation");
+        }
 
+        if (m_assemblyStation.CanAssembleDish(m_kitchenManager.GetCurrentOrder()))
+        {
+            Debug.Log(m_agentID + " is assembling the dish...");
+            yield return StartCoroutine(m_assemblyStation.AssembleDish(m_kitchenManager.GetCurrentOrder()));
+            Dish plat = m_assemblyStation.GetPreparedDish();
+            Debug.Log(m_agentID + " assembled the dish: " + (plat != null ? plat.GetName() : "Failed to assemble"));
+            m_agentMain = plat;
+            ShowIngredientInHand();
+        }
 
-        m_agentMain = null;
-        ShowIngredientInHand();
+        MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
+
     }
+
+
+
 
     private IEnumerator DeliverOrderRoutine(Counter _counter)
     {
@@ -220,20 +249,28 @@ public class Agent : MonoBehaviour
         if (currentOrder == null)
             yield break;
 
-        //Déplacer l’agent vers le comptoir
-        MoveTo(_counter.transform.position);
+        if(m_agentMain is Dish dish)
+        {
+            //Déplacer l’agent vers le comptoir
+            MoveTo(_counter.transform.position);
 
-        //Attendre que l’agent arrive à proximité
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 2f);
+            //Attendre que l’agent arrive à proximité
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 2f);
 
-        //Livrer la commande
-        _counter.ReceiveOrder(currentOrder, m_assemblyStation);
-        Debug.Log(m_agentID + " delivered order: " + currentOrder.GetOrderId());
+            //Livrer la commande
+            _counter.ReceiveOrder(currentOrder, dish);
+            m_agentMain = null;
+            ShowIngredientInHand();
+            Debug.Log(m_agentID + " delivered order: " + currentOrder.GetOrderId());
+        }
 
         //Nettoyer la commande dans le KitchenManager
         m_assemblyStation.ClearStation();
         m_kitchenManager.ClearCurrentOrder();
     }
+
+
+
 
     private T FindNearestAvailableStation<T>(List<T> stations) where T : WorkStation
     {
@@ -255,23 +292,28 @@ public class Agent : MonoBehaviour
     }
 
 
+
+
     public void ShowIngredientInHand()
     {
         Transform handTransform = transform.Find("Hand");
         if (handTransform == null)
             return;
 
-        // Détruit tout ce qu'il y a dans la main
         foreach (Transform child in handTransform)
             GameObject.Destroy(child.gameObject);
 
-        // Si l'agent a un ingrédient, affiche-le
-        if (m_agentMain != null && m_agentMain.GetPrefab() != null)
+        if (m_agentMain is Ingredient ingredient && ingredient.GetPrefab() != null)
         {
-            GameObject ingredientObj = GameObject.Instantiate(m_agentMain.GetPrefab(), handTransform);
-            ingredientObj.transform.localPosition = Vector3.zero;
-            ingredientObj.transform.localRotation = Quaternion.identity;
+            GameObject ingredientObj = GameObject.Instantiate(ingredient.GetPrefab(), handTransform);
+            ingredientObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        }
+        else if (m_agentMain is Dish dish && dish.GetPrefab() != null)
+        {
+            GameObject dishObj = GameObject.Instantiate(dish.GetPrefab(), handTransform);
+            dishObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
     }
+
 
 }

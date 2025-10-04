@@ -24,10 +24,8 @@ public class CuttingStation : WorkStation
     /// --- Methods ---
     public IEnumerator CutIngredient(Ingredient _ingredient)
     {
-        Debug.Log($"Cutting {_ingredient.GetName()}...");
         yield return new WaitForSeconds(3f);
         _ingredient.SetCuttingIngredientState(IngredientCuttingState.Cut);
-        Debug.Log($"{_ingredient.GetName()} is cut!");
         m_cuttedIngredient = _ingredient;
     }
 
@@ -45,8 +43,7 @@ public class CuttingStation : WorkStation
         if (_ingredient != null && _ingredient.GetPrefab() != null)
         {
             GameObject ingredientObj = GameObject.Instantiate(_ingredient.GetPrefab(), slotTransform);
-            ingredientObj.transform.localPosition = Vector3.zero;
-            ingredientObj.transform.localRotation = Quaternion.identity;
+            ingredientObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
     }
 }

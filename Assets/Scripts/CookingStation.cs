@@ -27,11 +27,10 @@ public class CookingStation : WorkStation
     /// --- Methods ---
     public IEnumerator CookIngredient(Ingredient _ingredient)
     {
-        Debug.Log($"Cooking {_ingredient.GetName()}...");
         m_cookedIngredient = _ingredient;
         yield return new WaitForSeconds(5f);
         _ingredient.SetCookingIngredientState(IngredientCookingState.Cooked);
-        Debug.Log($"{_ingredient.GetName()} is cooked!");
+        Debug.Log($"{_ingredient.GetName()} is cooked and ready to get picked up!");
 
         _ingredient.SetContainer(this);
 

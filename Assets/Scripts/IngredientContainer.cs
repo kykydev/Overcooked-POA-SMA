@@ -3,8 +3,11 @@ using UnityEngine;
 
 public class IngredientStation : WorkStation
 {
+
+    /// --- Attributes ---
     private Queue<Ingredient> m_ingredients = new Queue<Ingredient>();
 
+    /// --- Methods ---
     public Ingredient GetIngredient()
     {
         if (m_ingredients.Count == 0)
