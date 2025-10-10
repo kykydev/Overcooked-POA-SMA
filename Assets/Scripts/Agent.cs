@@ -9,16 +9,16 @@ using UnityEngineInternal;
 public class Agent : MonoBehaviour
 {
     /// --- Attributes ---
-    private int m_agentID;
-    private string m_agentName;
-    private object m_agentMain;
+    protected int m_agentID;
+    protected string m_agentName;
+    protected object m_agentMain;
 
-    private AssemblyStation m_assemblyStation;
-    private List<CookingStation> m_cookingStation;
-    private List<CuttingStation> m_cuttingStation;
+    protected AssemblyStation m_assemblyStation;
+    protected List<CookingStation> m_cookingStation;
+    protected List<CuttingStation> m_cuttingStation;
 
-    [SerializeField] private NavMeshAgent m_navAgent;
-    private KitchenManager m_kitchenManager;
+    [SerializeField] protected NavMeshAgent m_navAgent;
+    protected KitchenManager m_kitchenManager;
     
     /// ---- Getters ----
     public int GetAgentID() => m_agentID;
@@ -106,7 +106,7 @@ public class Agent : MonoBehaviour
 
 
     // Prise de commande au comptoir
-    private IEnumerator TakeOrderRoutine(Counter _counter)
+    protected IEnumerator TakeOrderRoutine(Counter _counter)
     {
 
         //Se déplacer vers le comptoir
@@ -128,7 +128,7 @@ public class Agent : MonoBehaviour
 
 
     // Récupération d’un ingrédient et dépose sur la workstation
-    private IEnumerator FetchIngredientRoutine(Ingredient _ingredient)
+    protected IEnumerator FetchIngredientRoutine(Ingredient _ingredient)
     {
         if (_ingredient == null)
             yield break;
@@ -243,7 +243,7 @@ public class Agent : MonoBehaviour
 
 
 
-    private IEnumerator DeliverOrderRoutine(Counter _counter)
+    protected IEnumerator DeliverOrderRoutine(Counter _counter)
     {
         Order currentOrder = m_kitchenManager.GetCurrentOrder();
         if (currentOrder == null)
@@ -272,7 +272,7 @@ public class Agent : MonoBehaviour
 
 
 
-    private T FindNearestAvailableStation<T>(List<T> stations) where T : WorkStation
+    protected T FindNearestAvailableStation<T>(List<T> stations) where T : WorkStation
     {
         T nearest = null;
         float minDist = float.MaxValue;

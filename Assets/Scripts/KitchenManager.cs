@@ -101,6 +101,10 @@ public class KitchenManager : MonoBehaviour
         }
     }
 
+    public void EnqueueIngredient(Ingredient _ingredient){
+        m_ingredientQueue.Enqueue(_ingredient);
+    }
+
     /// --- Methods ---
     void Start()
     {
@@ -122,6 +126,7 @@ public class KitchenManager : MonoBehaviour
         int j = 0;
         foreach (Agent agent in m_agents)
         {
+            Debug.Log("Starting Agent " + j);
             agent.SetAgentID(j);
             agent.SetKitchenManager(this);
             agent.SetAssemblyStation(m_assemblyStation);
