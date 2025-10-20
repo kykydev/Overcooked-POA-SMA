@@ -14,13 +14,16 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private IngredientStation m_breadContainer;
     [SerializeField] private IngredientStation m_steakContainer;
     [SerializeField] private IngredientStation m_onionContainer;
-    [SerializeField] private IngredientStation m_cheeseContainer;
 
-    [SerializeField] private AssemblyStation m_assemblyStation;
     [SerializeField] private List<CookingStation> m_cookingStation;
     [SerializeField] private List<CuttingStation> m_cuttingStation;
+    [SerializeField] private List<TableStation> m_tableStation;
+    [SerializeField] private PlateStation m_plateStation;
+    [SerializeField] private WashStation m_washStation;
 
     [SerializeField] private DishManager m_dishManager;
+
+    public GameObject m_platePrefab;
 
     private Order m_currentOrder;
     private bool m_isOrderBeingTaken = false;
@@ -85,11 +88,6 @@ public class KitchenManager : MonoBehaviour
                     ing.SetContainer(m_onionContainer);
                     m_onionContainer.SetIngredient(ing);
                 }
-                else if (proto.GetName() == "Cheese")
-                {
-                    ing.SetContainer(m_cheeseContainer);
-                    m_cheeseContainer.SetIngredient(ing);
-                }
                 ingredientQueue.Enqueue(ing);
             }
             m_ingredientQueue = ingredientQueue;
@@ -118,15 +116,20 @@ public class KitchenManager : MonoBehaviour
             m_counter.AddOrder(order);
         }
 
+        //Initialiser la pile d'assiette
+        m_plateStation.InitializePlateStack(5, m_platePrefab);
+
         //Lancer les agents
         int j = 0;
         foreach (Agent agent in m_agents)
         {
             agent.SetAgentID(j);
             agent.SetKitchenManager(this);
-            agent.SetAssemblyStation(m_assemblyStation);
             agent.SetCookingStation(m_cookingStation);
             agent.SetCuttingStation(m_cuttingStation);
+            agent.SetTableStation(m_tableStation);
+            agent.SetPlateStation(m_plateStation);
+            agent.SetWashStation(m_washStation);
             agent.Work(m_counter);
             j++;
         }

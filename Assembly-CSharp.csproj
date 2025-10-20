@@ -63,17 +63,48 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Dish.cs" />
     <Compile Include="Assets\Scripts\CookingStation.cs" />
+    <Compile Include="Assets\Scripts\Workstation.cs" />
+    <Compile Include="Assets\Scripts\IngredientStation.cs" />
     <Compile Include="Assets\Scripts\Agent.cs" />
     <Compile Include="Assets\Scripts\AssemblyStation.cs" />
     <Compile Include="Assets\Scripts\Counter.cs" />
+    <Compile Include="Assets\Scripts\TableStation.cs" />
     <Compile Include="Assets\Scripts\CuttingStation.cs" />
     <Compile Include="Assets\Scripts\KitchenManager.cs" />
-    <Compile Include="Assets\Scripts\WorkStation.cs" />
+    <Compile Include="Assets\Scripts\PlateStation.cs" />
+    <Compile Include="Assets\Scripts\WashStation.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\DishManager.cs" />
+    <Compile Include="Assets\Scripts\Plate.cs" />
     <Compile Include="Assets\Scripts\Ingredient.cs" />
     <Compile Include="Assets\Scripts\Order.cs" />
-    <Compile Include="Assets\Scripts\IngredientContainer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\AssetsEmprunté\Art\Fonts\Boogaloo\OFL.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\Lean\READ ME.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\AssetsEmprunté\3rdParty\TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1274,6 +1305,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="LeanCommon.csproj">
+      <Project>{962CB8FC-F44B-2D3E-4525-408EC3333B72}</Project>
+      <Name>LeanCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="LeanGUI.csproj">
+      <Project>{F76043A8-B2B6-7427-EE2F-C8E130CA5756}</Project>
+      <Name>LeanGUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="LeanTransition.csproj">
+      <Project>{7DBF8539-60E3-8CF8-44EF-52E3EE8407B8}</Project>
+      <Name>LeanTransition</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

@@ -28,7 +28,7 @@ public class Ingredient
     /// --- Getters ---
     public WorkStation GetContainer() => m_container;
     public string GetName() => m_ingredientName;
-    public IngredientCookingState GetState() => m_cookingState;
+    public IngredientCookingState GetCookingState() => m_cookingState;
     public bool GetNeedsCooking() => m_needsCooking;
     public IngredientCuttingState GetCuttingState() => m_cuttingState;
     public bool GetNeedsCutting() => m_needsCutting;

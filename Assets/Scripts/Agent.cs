@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem.Android;
@@ -13,9 +14,11 @@ public class Agent : MonoBehaviour
     private string m_agentName;
     private object m_agentMain;
 
-    private AssemblyStation m_assemblyStation;
     private List<CookingStation> m_cookingStation;
     private List<CuttingStation> m_cuttingStation;
+    private List<TableStation> m_tableStation;
+    private PlateStation m_plateStation;
+    private WashStation m_washStation;
 
     [SerializeField] private NavMeshAgent m_navAgent;
     private KitchenManager m_kitchenManager;
@@ -29,10 +32,12 @@ public class Agent : MonoBehaviour
     public void SetAgentID(int _id) => m_agentID = _id;
     public void SetAgentName(string _name) => m_agentName = _name;  
     public void SetAgentMain(object _main) => m_agentMain = _main;
-    public void SetAssemblyStation(AssemblyStation _assemblyStation) => m_assemblyStation = _assemblyStation;
     public void SetCookingStation(List<CookingStation> _cookingStation) => m_cookingStation = _cookingStation;
     public void SetCuttingStation(List<CuttingStation> _cuttingStation) => m_cuttingStation = _cuttingStation;
+    public void SetTableStation(List<TableStation> _tableStation) => m_tableStation = _tableStation;
+    public void SetPlateStation(PlateStation _plateStation) => m_plateStation = _plateStation;
     public void SetKitchenManager(KitchenManager _kitchenManager) => m_kitchenManager = _kitchenManager;
+    public void SetWashStation(WashStation _washStation) => m_washStation = _washStation;
 
 
     /// ---- Methods ----
@@ -65,6 +70,7 @@ public class Agent : MonoBehaviour
             {
                 m_kitchenManager.SetOrderBeingTaken(true);
                 yield return StartCoroutine(TakeOrderRoutine(_counter));
+                yield return StartCoroutine(FetchAndAssignPlate());
                 m_kitchenManager.SetOrderBeingTaken(false);
             }
 
@@ -90,6 +96,7 @@ public class Agent : MonoBehaviour
 
                         m_kitchenManager.SetOrderBeingTaken(true);
                         yield return StartCoroutine(TakeOrderRoutine(_counter));
+                        yield return StartCoroutine(FetchAndAssignPlate());
                         m_kitchenManager.SetOrderBeingTaken(false);
 
                         m_kitchenManager.SetOrderBeingDelivered(false);
@@ -110,10 +117,10 @@ public class Agent : MonoBehaviour
     {
 
         //Se déplacer vers le comptoir
-        m_navAgent.SetDestination(_counter.transform.position);
+        MoveTo(_counter.transform.position);
 
         //Attendre que l’agent soit proche
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 2f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 1.5f);
 
         //Récupérer la commande
         m_kitchenManager.SetCurrentOrder(_counter.GiveOrder());
@@ -122,6 +129,64 @@ public class Agent : MonoBehaviour
             m_kitchenManager.GetCurrentOrder().SetStatus(OrderStatus.Preparing);
             Debug.Log(m_agentID + " took order: " + m_kitchenManager.GetCurrentOrder().GetOrderId());
         }
+    }
+
+    // Prise de commande au comptoir
+    private IEnumerator FetchAndAssignPlate()
+    {
+        if (m_agentMain is Plate plate)
+        {
+            if (!plate.IsClean())
+            {
+                m_washStation.LockStation();
+
+                //Se déplacer vers le bac à vaisselle
+                MoveTo(m_washStation.transform.position);
+                //Attendre que l’agent soit proche
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, m_washStation.transform.position) < 1.5f);
+                m_agentMain = null;
+                ShowObjectInHand();
+                //Nettoyer l'assiette
+                Debug.Log(m_agentID + " is washing the plate.");
+                yield return StartCoroutine(m_washStation.WashPlate(plate));
+                m_agentMain = m_washStation.GetObject();
+                ShowObjectInHand();
+
+                m_washStation.UnlockStation();
+            }
+        }
+
+        else if (m_agentMain == null)
+        {
+            m_plateStation.LockStation();
+
+            //Se déplacer vers la station d'assiette
+            MoveTo(m_plateStation.transform.position);
+            //Attendre que l’agent soit proche
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_plateStation.transform.position) < 1.5f);
+            //Récupérer une assiette propre
+            m_agentMain = m_plateStation.GetPlate();
+            ShowObjectInHand();
+
+            m_plateStation.UnlockStation();
+        }
+
+        if (m_agentMain is Plate newPlate)
+        {
+            Debug.Log(m_agentID + " picked up a clean plate.");
+            //Va a la table la plus proche et assigne l'assiette a la commande
+            var nearestTable = FindNearestAvailableStation(m_tableStation);
+            if (nearestTable != null)
+            {
+                MoveTo(nearestTable.transform.position);
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestTable.transform.position) < 1.5f);
+                nearestTable.AssignPlateToOrder(newPlate, m_kitchenManager.GetCurrentOrder());
+                Debug.Log(m_agentID + " assigned plate to order" + m_kitchenManager.GetCurrentOrder().GetOrderId());
+                m_agentMain = null;
+                ShowObjectInHand();
+            }
+        }
+
     }
 
 
@@ -139,15 +204,15 @@ public class Agent : MonoBehaviour
 
         //Se déplacer vers le bac
         MoveTo(container.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, container.transform.position) < 2f);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, container.transform.position) < 1.5f);
 
         //Récupérer l’ingrédient
         if (container is IngredientStation station)
             m_agentMain = station.GetIngredient();
         else if (container is CookingStation cooking)
-            m_agentMain = cooking.GetIngredient();
+            m_agentMain = cooking.GetObject();
 
-        ShowIngredientInHand();
+        ShowObjectInHand();
 
 
         if (m_agentMain is Ingredient ingredient)
@@ -164,14 +229,13 @@ public class Agent : MonoBehaviour
                 nearestCooking.LockStation();
 
                 MoveTo(nearestCooking.transform.position);
-                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCooking.transform.position) < 2f);
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCooking.transform.position) < 1.5f);
 
-                nearestCooking.ShowIngredientOnStation(ingredient);
                 nearestCooking.StartCoroutine(nearestCooking.CookIngredient(ingredient));
 
                 Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cookingStation");
                 m_agentMain = null;
-                ShowIngredientInHand();
+                ShowObjectInHand();
 
                 nearestCooking.UnlockStation();
 
@@ -189,18 +253,16 @@ public class Agent : MonoBehaviour
                 nearestCutting.LockStation();
 
                 MoveTo(nearestCutting.transform.position);
-                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCutting.transform.position) < 2f);
+                yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCutting.transform.position) < 1.5f);
 
-                nearestCutting.ShowIngredientOnStation(ingredient);
                 m_agentMain = null;
-                ShowIngredientInHand();
+                ShowObjectInHand();
                 Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cuttingStation");
                 Debug.Log(m_agentID + " cutting: " + ingredient.GetName());
 
                 yield return StartCoroutine(nearestCutting.CutIngredient(ingredient));
-                Debug.Log(m_agentID + " has cut: " + ingredient.GetName());
-                m_agentMain = nearestCutting.GetIngredient();
-                ShowIngredientInHand();
+                m_agentMain = nearestCutting.GetObject();
+                ShowObjectInHand();
 
                 nearestCutting.UnlockStation();
 
@@ -213,35 +275,37 @@ public class Agent : MonoBehaviour
         }
 
 
-        //Se déplacer vers la workstation d’assemblage
-        MoveTo(m_assemblyStation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_assemblyStation.transform.position) < 2f);
+        //Se déplacer vers l'assiette assignée a la commande
+        var tableStation = m_kitchenManager.GetCurrentOrder().GetTableStation();
+        var plate = tableStation.GetPlate();
+        MoveTo(tableStation.transform.position);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, tableStation.transform.position) < 1.5f);
 
         //Déposer l’objet sur la workstation d’assemblage
         if (m_agentMain is Ingredient ingredientToPlace)
         {
-            m_assemblyStation.AddIngredient(ingredientToPlace);
+            plate.AddIngredient(ingredientToPlace);
             m_agentMain = null;
-            ShowIngredientInHand();
-            Debug.Log(m_agentID + " placed: " + ingredientToPlace.GetName() + " on assemblyStation");
+            ShowObjectInHand();
+            Debug.Log(m_agentID + " placed: " + ingredientToPlace.GetName() + " on plate");
         }
 
-        if (m_assemblyStation.CanAssembleDish(m_kitchenManager.GetCurrentOrder()))
+        if (plate.CanAssembleDish(m_kitchenManager.GetCurrentOrder()))
         {
             Debug.Log(m_agentID + " is assembling the dish...");
-            yield return StartCoroutine(m_assemblyStation.AssembleDish(m_kitchenManager.GetCurrentOrder()));
-            Dish plat = m_assemblyStation.GetPreparedDish();
+            yield return StartCoroutine(plate.AssembleDish(m_kitchenManager.GetCurrentOrder()));
+            Dish plat = plate.GetPreparedDish();
             Debug.Log(m_agentID + " assembled the dish: " + (plat != null ? plat.GetName() : "Failed to assemble"));
             m_agentMain = plat;
-            ShowIngredientInHand();
+            ShowObjectInHand();
+            //Enlever l'assiette de la table
+            tableStation.RemovePlate();
+
         }
 
         MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
 
     }
-
-
-
 
     private IEnumerator DeliverOrderRoutine(Counter _counter)
     {
@@ -249,25 +313,34 @@ public class Agent : MonoBehaviour
         if (currentOrder == null)
             yield break;
 
-        if(m_agentMain is Dish dish)
+        if (m_agentMain is Dish dish)
         {
             //Déplacer l’agent vers le comptoir
             MoveTo(_counter.transform.position);
 
             //Attendre que l’agent arrive à proximité
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 2f);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, _counter.transform.position) < 1.5f);
 
             //Livrer la commande
             _counter.ReceiveOrder(currentOrder, dish);
             m_agentMain = null;
-            ShowIngredientInHand();
+            ShowObjectInHand();
             Debug.Log(m_agentID + " delivered order: " + currentOrder.GetOrderId());
+
+            // Créer une nouvelle assiette sale et la donner à l'agent
+            Plate dirtyPlate = new Plate(m_kitchenManager.m_platePrefab);
+            dirtyPlate.SetState(PlateState.Dirty);
+            m_agentMain = dirtyPlate;
+            ShowObjectInHand();
+            Debug.Log(m_agentID + " picked up new dirty plate.");
         }
 
         //Nettoyer la commande dans le KitchenManager
-        m_assemblyStation.ClearStation();
+        currentOrder.GetTableStation().RemovePlate();
         m_kitchenManager.ClearCurrentOrder();
     }
+
+
 
 
 
@@ -294,7 +367,7 @@ public class Agent : MonoBehaviour
 
 
 
-    public void ShowIngredientInHand()
+    public void ShowObjectInHand()
     {
         Transform handTransform = transform.Find("Hand");
         if (handTransform == null)
@@ -312,6 +385,11 @@ public class Agent : MonoBehaviour
         {
             GameObject dishObj = GameObject.Instantiate(dish.GetPrefab(), handTransform);
             dishObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        }
+        else if (m_agentMain is Plate plate && plate.GetPrefab() != null)
+        {
+            GameObject plateObj = GameObject.Instantiate(plate.GetPrefab(), handTransform);
+            plateObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
     }
 
