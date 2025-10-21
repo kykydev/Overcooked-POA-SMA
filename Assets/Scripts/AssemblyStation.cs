@@ -63,7 +63,6 @@ public class AssemblyStation : WorkStation
         yield return new WaitForSeconds(5f);
         Dish assembledDish = new Dish(order.GetDish().GetName(), order.GetDish().GetRecipe(), order.GetDish().GetPrefab());
         m_preparedDish = assembledDish;
-        order.SetStatus(OrderStatus.Completed);
     }
 
 

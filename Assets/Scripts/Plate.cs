@@ -68,7 +68,6 @@ public class Plate
         yield return new WaitForSeconds(5f);
 
         m_preparedDish = new Dish(order.GetDish().GetName(), order.GetDish().GetRecipe(), order.GetDish().GetPrefab());
-        order.SetStatus(OrderStatus.Completed);
     }
 
     public Dish GetPreparedDish()

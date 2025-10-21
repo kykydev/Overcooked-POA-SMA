@@ -21,7 +21,7 @@ public class CookingStation : WorkStation
         Debug.Log($"{_ingredient.GetName()} is cooked and ready to get picked up!");
 
         _ingredient.SetContainer(this);
-        m_kitchenManager.GetIngredientQueue().Enqueue(_ingredient);
+       _ingredient.GetOrder().GetIngredientQueue().Enqueue(_ingredient);
 
         UnlockStation();
     }

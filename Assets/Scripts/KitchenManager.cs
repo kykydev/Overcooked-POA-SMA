@@ -6,9 +6,10 @@ public class KitchenManager : MonoBehaviour
     /// --- Attributes ---
     [Header("Scene References")]
     [SerializeField] private List<Agent> m_agents;
-
     [SerializeField] private Counter m_counter;
+    [SerializeField] private DishManager m_dishManager;
 
+    [Header("Workstations")]
     [SerializeField] private IngredientStation m_tomatoContainer;
     [SerializeField] private IngredientStation m_saladContainer;
     [SerializeField] private IngredientStation m_breadContainer;
@@ -21,105 +22,108 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private PlateStation m_plateStation;
     [SerializeField] private WashStation m_washStation;
 
-    [SerializeField] private DishManager m_dishManager;
+    [Header("Prefabs")]
+    [SerializeField] public GameObject m_platePrefab;
 
-    public GameObject m_platePrefab;
-
-    private Order m_currentOrder;
-    private bool m_isOrderBeingTaken = false;
-    private bool m_isOrderBeingDelivered = false;
-
-    private int m_money;
-
-    private Queue<Ingredient> m_ingredientQueue;
-
-    /// --- Order State Management ---
-    public bool IsOrderBeingTaken() => m_isOrderBeingTaken;
-    public void SetOrderBeingTaken(bool value) => m_isOrderBeingTaken = value;
-    public bool IsOrderBeingDelivered() => m_isOrderBeingDelivered;
-    public void SetOrderBeingDelivered(bool value) => m_isOrderBeingDelivered = value;
+    /// --- Current Order Management ---
+    private List<Order> m_currentOrders = new List<Order>();
 
     /// --- Getters ---
-    public Order GetCurrentOrder() => m_currentOrder;
-    public Queue<Ingredient> GetIngredientQueue() => m_ingredientQueue;
+    public List<Order> GetCurrentOrders() => m_currentOrders;
 
-    public Ingredient GetCurrentIngredient()
+    /// <summary>
+    /// Retourne le prochain ingrédient disponible dans la liste des commandes en cours. Le parcours se fait dans l'ordre des commandes.
+    /// </summary>
+    /// <returns></returns>
+    public Ingredient GetNextAvailableIngredient()
     {
-        if (m_ingredientQueue == null || m_ingredientQueue.Count == 0)
-            return null;
+        foreach (var order in m_currentOrders)
+        {
+            if (order.GetIngredientQueue().Count == 0) continue;
 
-        return m_ingredientQueue.Dequeue();
+            return order.GetIngredientQueue().Dequeue();
+        }
+        return null;
     }
 
-    /// --- Setters ---
-    public void SetCurrentOrder(Order _order)
+    /// <summary>
+    /// Ajoute une commande à la liste des commandes en cours et initialise les ingrédients nécessaires en les affectant aux stations appropriées. 
+    /// Ensuite, remplit la Queue d'ingrédients, celle qui sera utilisée par les agents pour récupérer les ingrédients.
+    /// </summary>
+    /// <param name="_order"></param>    
+    public void AddOrder(Order _order)
+    
     {
-        if (m_currentOrder == null)
-        {
-            m_currentOrder = _order;
-            var ingredientQueue = new Queue<Ingredient>();
-            foreach (Ingredient proto in _order.GetDish().GetRecipe())
-            {
-                // Clone l'ingrédient pour cette commande
-                Ingredient ing = new Ingredient(proto.GetName(), proto.GetNeedsCooking(), proto.GetNeedsCutting(), proto.GetPrefab());
+        m_currentOrders.Add(_order);
 
-                if (proto.GetName() == "Tomato")
-                {
+        Queue<Ingredient> ingredientQueue = new Queue<Ingredient>();
+
+        foreach (Ingredient proto in _order.GetDish().GetRecipe())
+        {
+            Ingredient ing = new Ingredient(proto.GetName(), proto.GetNeedsCooking(), proto.GetNeedsCutting(), proto.GetPrefab());
+            ing.SetOrder(_order);
+
+            switch (proto.GetName())
+            {
+                case "Tomato":
                     ing.SetContainer(m_tomatoContainer);
                     m_tomatoContainer.SetIngredient(ing);
-                }
-                else if (proto.GetName() == "Salad")
-                {
+                    break;
+                case "Salad":
                     ing.SetContainer(m_saladContainer);
                     m_saladContainer.SetIngredient(ing);
-                }
-                else if (proto.GetName() == "Bread")
-                {
+                    break;
+                case "Bread":
                     ing.SetContainer(m_breadContainer);
                     m_breadContainer.SetIngredient(ing);
-                }
-                else if (proto.GetName() == "Steak")
-                {
+                    break;
+                case "Steak":
                     ing.SetContainer(m_steakContainer);
                     m_steakContainer.SetIngredient(ing);
-                }
-                else if (proto.GetName() == "Onion")
-                {
+                    break;
+                case "Onion":
                     ing.SetContainer(m_onionContainer);
                     m_onionContainer.SetIngredient(ing);
-                }
-                ingredientQueue.Enqueue(ing);
+                    break;
             }
-            m_ingredientQueue = ingredientQueue;
 
+            ingredientQueue.Enqueue(ing);
         }
-        else
-        {
-            Debug.LogWarning("Overwriting Current Order: " + m_currentOrder.GetOrderId() + " with " + _order.GetOrderId());
-        }
+
+        _order.GetIngredientQueue().Clear();
+        foreach (var ing in ingredientQueue)
+            _order.GetIngredientQueue().Enqueue(ing);
     }
 
-    /// --- Methods ---
+
+    /// <summary>
+    /// Initialise les commandes, la pile d'assiettes et assigne les stations aux agents.
+    /// </summary>
+    /// <returns></returns>
     void Start()
     {
 
-        //Récupérer 10 plats aléatoires
-        List<Dish> randomDishes = m_dishManager.GetRandomDishes(10);
+        int n = 10;
+        List<Dish> randomDishes = m_dishManager.GetRandomDishes(n);
 
-        //Créer les commandes
         int i = 0;
         foreach (Dish dish in randomDishes)
         {
             string orderId = dish.GetName() + "_" + i;
             i++;
             Order order = new Order(orderId, dish, 15);
-            m_counter.AddOrder(order);
+            AddOrder(order);
         }
 
-        //Initialiser la pile d'assiette
+        Debug.Log("Initialized " + n + " orders.");
+        //Affiche tout les orders dans la console
+        foreach (Order order in m_currentOrders)
+        {
+            Debug.Log("Order ID: " + order.GetOrderId());
+        }
+
         m_plateStation.InitializePlateStack(5, m_platePrefab);
 
-        //Lancer les agents
         int j = 0;
         foreach (Agent agent in m_agents)
         {
@@ -135,25 +139,23 @@ public class KitchenManager : MonoBehaviour
         }
     }
 
-    //Verifie si une commande est en cours
-    public bool HasCurrentOrder()
+    /// <summary>
+    /// Vérifie s'il y a des commandes en cours.
+    /// </summary>
+    /// <returns></returns>
+    public bool HasCurrentOrders()
     {
-        return m_currentOrder != null && m_currentOrder.GetStatus() != OrderStatus.Delivered;
+        return m_currentOrders.Count > 0;
     }
 
-    //Vide la commande en cours
-    public void ClearCurrentOrder()
+    /// <summary>
+    /// Retire une commande de la liste des commandes en cours.
+    /// </summary>
+    /// <param name="order"></param>
+    public void RemoveOrder(Order _order)
     {
-        m_currentOrder = null;
-        m_ingredientQueue = new Queue<Ingredient>();
-    }
-
-
-    //Ajoute de l'argent au total
-    public void AddMoney(int amount)
-    {
-        m_money += amount;
-        Debug.Log("Total Money: " + m_money);
+        if (m_currentOrders.Contains(_order))
+            m_currentOrders.Remove(_order);
     }
 
 }

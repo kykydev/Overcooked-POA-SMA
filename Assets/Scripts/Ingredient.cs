@@ -14,6 +14,7 @@ public class Ingredient
     private bool m_needsCutting = false;
     private WorkStation m_container;
     private GameObject m_prefab;
+    private Order m_order;
 
     /// --- Constructor ---
     public Ingredient(string _name, bool _needsCooking, bool _needsCutting, GameObject _prefab)
@@ -33,12 +34,14 @@ public class Ingredient
     public IngredientCuttingState GetCuttingState() => m_cuttingState;
     public bool GetNeedsCutting() => m_needsCutting;
     public GameObject GetPrefab() => m_prefab;
+    public Order GetOrder() => m_order;
 
     /// --- Setters ---
     public void SetContainer(WorkStation _container) => m_container = _container;
     public void SetIngredientName(string _name) => m_ingredientName = _name;
     public void SetCookingIngredientState(IngredientCookingState _state) => m_cookingState = _state;
     public void SetCuttingIngredientState(IngredientCuttingState _state) => m_cuttingState = _state;
+    public void SetOrder(Order _order) => m_order = _order;
 
     /// --- Methods ---
     public bool NeedsCooking() => m_needsCooking && m_cookingState == IngredientCookingState.Raw;

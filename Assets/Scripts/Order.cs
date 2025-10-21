@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// --- Enumeration ---
-public enum OrderStatus { Pending, Preparing, Completed, Delivered }
-
 public class Order
 {
     /// --- Attributes ---
@@ -13,7 +10,7 @@ public class Order
     private Plate m_plate = null;
     private TableStation m_tableStation = null;
 
-    private OrderStatus m_status = OrderStatus.Pending;
+    private Queue<Ingredient> m_ingredientQueue = new Queue<Ingredient>();
 
     /// --- Constructor ---
     public Order(string _id, Dish _dish, int _reward)
@@ -23,19 +20,28 @@ public class Order
         m_reward = _reward;
     }
 
+    /// --- Plate&Order Assignment State ---
+    private bool m_isPlateBeingAssigned = false;
+    public bool IsPlateBeingAssigned() => m_isPlateBeingAssigned;
+    public void SetPlateBeingAssigned(bool value) => m_isPlateBeingAssigned = value;
+
+    private bool m_isBeingDelivered = false;
+    public bool IsBeingDelivered() => m_isBeingDelivered;
+    public void SetBeingDelivered(bool value) => m_isBeingDelivered = value;
+
+
     /// --- Getters ---
     public string GetOrderId() => m_orderId;
     public Dish GetDish() => m_dish;
     public int GetReward() => m_reward;
-    public OrderStatus GetStatus() => m_status;
     public Plate GetPlate() => m_plate;
-    public TableStation GetTableStation() => m_tableStation;  
+    public TableStation GetTableStation() => m_tableStation;
+    public Queue<Ingredient> GetIngredientQueue() => m_ingredientQueue;
 
     /// --- Setters ---
     public void SetOrderId(string _id) => m_orderId = _id;
     public void SetDish(Dish _dish) => m_dish = _dish;
     public void SetReward(int _newReward) => m_reward = _newReward;
-    public void SetStatus(OrderStatus _newStatus) => m_status = _newStatus;
     public void SetPlate(Plate _plate) => m_plate = _plate;
     public void SetTableStation(TableStation _tableStation) => m_tableStation = _tableStation;
 

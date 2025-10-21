@@ -21,36 +21,36 @@ public class DishManager : MonoBehaviour
     {
         m_allDishes = new List<Dish>
         {
-            //new Dish("Burger", new List<Ingredient> {
-            //    new Ingredient("Steak", true, true, m_steakPrefab),
-            //    new Ingredient("Tomato", false, true, m_tomatoPrefab),
-            //    new Ingredient("Salad", false, true, m_saladPrefab),
-            //    new Ingredient("Bread", false, false, m_breadPrefab),
-            //    new Ingredient("Onion", false, true, m_onionPrefab),
-            //},
-            //m_dishBurgerPrefab
-            //),
-             //new Dish("Salad", new List<Ingredient> {
-             //    new Ingredient("Tomato", false, true, m_tomatoPrefab),
-             //    new Ingredient("Salad", false, true, m_saladPrefab),
-             //    new Ingredient("Onion", false, true, m_onionPrefab)
+            new Dish("Burger", new List<Ingredient> {
+                new Ingredient("Steak", true, true, m_steakPrefab),
+                new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                new Ingredient("Salad", false, true, m_saladPrefab),
+                new Ingredient("Bread", false, false, m_breadPrefab),
+                new Ingredient("Onion", false, true, m_onionPrefab),
+            },
+            m_dishBurgerPrefab
+            ),
+             new Dish("Salad", new List<Ingredient> {
+                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab)
 
-             //},
-             //m_dishSaladPrefab
-             //),
-             //new Dish("VeganBurger", new List<Ingredient> {
-             //    new Ingredient("Tomato", false, true, m_tomatoPrefab),
-             //    new Ingredient("Salad", false, true, m_saladPrefab),
-             //    new Ingredient("Bread", false, false, m_breadPrefab),
-             //    new Ingredient("Onion", false, true, m_onionPrefab)
-             //},
-             //m_dishBurgerPrefab
-             //),
-             //new Dish("Steak", new List<Ingredient> {
-             //    new Ingredient("Steak", true, true, m_steakPrefab)
-             //},
-             //m_dishBurgerPrefab
-             //)
+             },
+             m_dishSaladPrefab
+             ),
+             new Dish("VeganBurger", new List<Ingredient> {
+                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Bread", false, false, m_breadPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab)
+             },
+             m_dishBurgerPrefab
+             ),
+             new Dish("Steak", new List<Ingredient> {
+                 new Ingredient("Steak", true, true, m_steakPrefab)
+             },
+             m_dishBurgerPrefab
+             ),
              new Dish ("DoubleBurger", new List<Ingredient> {
                  new Ingredient("Steak", true, true, m_steakPrefab),
                  new Ingredient("Steak", true, true, m_steakPrefab),

@@ -50,15 +50,6 @@ public class Counter : MonoBehaviour
         {
             sameIngredients = false;
         }
-
-        if (sameName && sameIngredients)
-        {
-            _order.SetStatus(OrderStatus.Delivered);
-        }
-        else
-        {
-            Debug.LogWarning("Order incorrect or incomplete!");
-        }
     }
 
 
