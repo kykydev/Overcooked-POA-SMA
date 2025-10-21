@@ -231,13 +231,10 @@ public class Agent : MonoBehaviour
                 MoveTo(nearestCooking.transform.position);
                 yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestCooking.transform.position) < 1.5f);
 
-                nearestCooking.StartCoroutine(nearestCooking.CookIngredient(ingredient));
-
-                Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cookingStation");
                 m_agentMain = null;
                 ShowObjectInHand();
-
-                nearestCooking.UnlockStation();
+                Debug.Log(m_agentID + " placing: " + ingredient.GetName() + " on cookingStation");
+                nearestCooking.StartCoroutine(nearestCooking.CookIngredient(ingredient));
 
                 MoveTo(transform.position + new Vector3(Random.Range(-5f, 5f), 0, Random.Range(-5f, 5f)));
                 yield break;
@@ -288,6 +285,7 @@ public class Agent : MonoBehaviour
             m_agentMain = null;
             ShowObjectInHand();
             Debug.Log(m_agentID + " placed: " + ingredientToPlace.GetName() + " on plate");
+            tableStation.UpdatePlateVisual();
         }
 
         if (plate.CanAssembleDish(m_kitchenManager.GetCurrentOrder()))

@@ -22,6 +22,8 @@ public class CookingStation : WorkStation
 
         _ingredient.SetContainer(this);
         m_kitchenManager.GetIngredientQueue().Enqueue(_ingredient);
+
+        UnlockStation();
     }
 
     public bool HasCookedIngredient()
