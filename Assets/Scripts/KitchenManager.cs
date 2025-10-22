@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class KitchenManager : MonoBehaviour
@@ -23,7 +24,9 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private WashStation m_washStation;
 
     [Header("Prefabs")]
-    [SerializeField] public GameObject m_platePrefab;
+    public GameObject m_cleanPlatePrefab;
+    public GameObject m_dirtyPlatePrefab;
+    public GameObject m_steakCuitPrefab;
 
     /// --- Current Order Management ---
     private List<Order> m_currentOrders = new List<Order>();
@@ -102,7 +105,14 @@ public class KitchenManager : MonoBehaviour
     /// <returns></returns>
     void Start()
     {
+        InitializeOrders();
+        m_plateStation.InitializePlateStack(5, m_cleanPlatePrefab, m_dirtyPlatePrefab);
 
+        StartCoroutine(StartAgentsNextFrame());
+    }
+
+    void InitializeOrders()
+    {
         int n = 10;
         List<Dish> randomDishes = m_dishManager.GetRandomDishes(n);
 
@@ -116,13 +126,13 @@ public class KitchenManager : MonoBehaviour
         }
 
         Debug.Log("Initialized " + n + " orders.");
-        //Affiche tout les orders dans la console
         foreach (Order order in m_currentOrders)
-        {
             Debug.Log("Order ID: " + order.GetOrderId());
-        }
+    }
 
-        m_plateStation.InitializePlateStack(5, m_platePrefab);
+    IEnumerator StartAgentsNextFrame()
+    {
+        yield return null; // attend une frame pour être sûr que tout est initialisé
 
         int j = 0;
         foreach (Agent agent in m_agents)
@@ -138,6 +148,7 @@ public class KitchenManager : MonoBehaviour
             j++;
         }
     }
+
 
     /// <summary>
     /// Vérifie s'il y a des commandes en cours.

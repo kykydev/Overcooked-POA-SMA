@@ -8,6 +8,8 @@ public enum PlateState { Clean, Dirty }
 public class Plate
 {
     private GameObject m_prefab;
+    private GameObject m_cleanPlatePrefab;
+    private GameObject m_dirtyPlatePrefab;
     private PlateState m_state = PlateState.Clean;
     private object m_container;
 
@@ -15,15 +17,20 @@ public class Plate
     private List<Ingredient> m_placedIngredients = new List<Ingredient>();
     private Dish m_preparedDish;
 
-    public Plate(GameObject _prefab)
+    public Plate(GameObject _cleanPlatePrefab, GameObject _dirtyPlatePrefab)
     {
-        m_prefab = _prefab;
+        m_prefab = _cleanPlatePrefab;
+        m_cleanPlatePrefab = _cleanPlatePrefab;
+        m_dirtyPlatePrefab = _dirtyPlatePrefab;
     }
 
     /// --- Getters / Setters ---
     public GameObject GetPrefab() => m_prefab;
+    public GameObject GetCleanPlatePrefab() => m_cleanPlatePrefab;
+    public GameObject GetDirtyPlatePrefab() => m_dirtyPlatePrefab;
     public PlateState GetState() => m_state;
     public object GetContainer() => m_container;
+    public void SetPrefab(GameObject prefab) => m_prefab = prefab;
     public void SetState(PlateState state) => m_state = state;
     public void SetContainer(object container) => m_container = container;
 

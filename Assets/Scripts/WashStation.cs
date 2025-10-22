@@ -14,7 +14,9 @@ public class WashStation : WorkStation
 
         yield return new WaitForSeconds(3f);
 
+        _plate.SetPrefab(_plate.GetCleanPlatePrefab());
         _plate.SetState(PlateState.Clean);
         Debug.Log("plate has been washed and is clean!");
+        UnlockStation();
     }
 }

@@ -18,6 +18,8 @@ public class CookingStation : WorkStation
         yield return new WaitForSeconds(5f);
 
         _ingredient.SetCookingIngredientState(IngredientCookingState.Cooked);
+        _ingredient.SetPrefab(m_kitchenManager.m_steakCuitPrefab);
+        ShowObjectOnStation(_ingredient);
         Debug.Log($"{_ingredient.GetName()} is cooked and ready to get picked up!");
 
         _ingredient.SetContainer(this);

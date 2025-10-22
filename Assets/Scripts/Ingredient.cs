@@ -42,6 +42,7 @@ public class Ingredient
     public void SetCookingIngredientState(IngredientCookingState _state) => m_cookingState = _state;
     public void SetCuttingIngredientState(IngredientCuttingState _state) => m_cuttingState = _state;
     public void SetOrder(Order _order) => m_order = _order;
+    public void SetPrefab(GameObject _prefab) => m_prefab = _prefab;
 
     /// --- Methods ---
     public bool NeedsCooking() => m_needsCooking && m_cookingState == IngredientCookingState.Raw;

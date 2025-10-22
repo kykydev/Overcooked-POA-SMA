@@ -56,7 +56,11 @@ public class TableStation : WorkStation {
             ingObj.name = "IngredientVisual_" + ing.GetName();
             ingObj.transform.localPosition = new Vector3(0, height, 0);
             ingObj.transform.localRotation = Quaternion.identity;
-            height += 0.20f;
+            if(ing.GetName().Contains("Onion"))
+                ingObj.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+            else
+                ingObj.transform.localScale = new Vector3(1.7f, 1.7f, 1.7f);
+            height += 0.30f;
         }
     }
     }

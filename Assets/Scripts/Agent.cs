@@ -116,36 +116,41 @@ public class Agent : MonoBehaviour
     private IEnumerator FetchAndAssignPlate(Order _order)
     {
         // Si l'agent a une assiette sale dans les mains, il va la laver
-        if (m_agentMain is Plate plate)
+        if (m_agentMain is Plate plate && !plate.IsClean())
         {
-            if (!plate.IsClean())
-            {
-                m_washStation.LockStation();
+            // Attendre que la wash station soit libre
+            yield return new WaitUntil(() => !m_washStation.IsLocked());
 
-                MoveTo(m_washStation.transform.position);
-                yield return new WaitUntil(() => Vector3.Distance(transform.position, m_washStation.transform.position) < 1.5f);
-                m_agentMain = null;
-                ShowObjectInHand();
-                Debug.Log(m_agentID + " is washing the plate.");
-                yield return StartCoroutine(m_washStation.WashPlate(plate));
-                m_agentMain = m_washStation.GetObject();
-                ShowObjectInHand();
+            m_washStation.LockStation();
 
-                m_washStation.UnlockStation();
-            }
+            MoveTo(m_washStation.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_washStation.transform.position) < 1.5f);
+
+            m_agentMain = null;
+            ShowObjectInHand();
+            Debug.Log(m_agentID + " is washing the plate.");
+            yield return StartCoroutine(m_washStation.WashPlate(plate));
+            m_agentMain = m_washStation.GetObject();
+            ShowObjectInHand();
         }
 
         // Si l'agent n'a pas d'assiette, il va en chercher une propre
         else if (m_agentMain == null)
         {
-            m_plateStation.LockStation();
-
             MoveTo(m_plateStation.transform.position);
             yield return new WaitUntil(() => Vector3.Distance(transform.position, m_plateStation.transform.position) < 1.5f);
-            m_agentMain = m_plateStation.GetPlate();
-            ShowObjectInHand();
 
-            m_plateStation.UnlockStation();
+            // Attendre qu'une assiette propre soit disponible
+            Plate cleanPlate = null;
+            while (cleanPlate == null)
+            {
+                cleanPlate = m_plateStation.GetPlate();
+                if (cleanPlate == null)
+                    yield return null; // attendre la prochaine frame
+            }
+
+            m_agentMain = cleanPlate;
+            ShowObjectInHand();
         }
 
         // L'agent assigne l'assiette propre à la commande et la dépose sur la table la plus proche
@@ -155,19 +160,18 @@ public class Agent : MonoBehaviour
             var nearestTable = FindNearestAvailableStation(m_tableStation);
             if (nearestTable != null)
             {
-                
                 nearestTable.LockStation();
 
                 MoveTo(nearestTable.transform.position);
                 yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestTable.transform.position) < 1.5f);
                 nearestTable.AssignPlateToOrder(newPlate, _order);
-                Debug.Log(m_agentID + " assigned plate to order" + _order.GetOrderId());
+                Debug.Log(m_agentID + " assigned plate to order " + _order.GetOrderId());
                 m_agentMain = null;
                 ShowObjectInHand();
             }
         }
-
     }
+
 
 
     /// <summary>
@@ -328,7 +332,8 @@ public class Agent : MonoBehaviour
         Debug.Log(m_agentID + " delivered order: " + _order.GetOrderId());
 
         // Créer une nouvelle assiette sale et la donner à l'agent
-        Plate dirtyPlate = new Plate(m_kitchenManager.m_platePrefab);
+        Plate dirtyPlate = new Plate(m_kitchenManager.m_cleanPlatePrefab, m_kitchenManager.m_dirtyPlatePrefab);
+        dirtyPlate.SetPrefab(m_kitchenManager.m_dirtyPlatePrefab);
         dirtyPlate.SetState(PlateState.Dirty);
         m_agentMain = dirtyPlate;
         ShowObjectInHand();
