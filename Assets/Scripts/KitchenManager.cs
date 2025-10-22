@@ -132,7 +132,7 @@ public class KitchenManager : MonoBehaviour
 
     IEnumerator StartAgentsNextFrame()
     {
-        yield return null; // attend une frame pour être sûr que tout est initialisé
+        yield return new WaitUntil(() => m_plateStation.HasPlates());
 
         int j = 0;
         foreach (Agent agent in m_agents)

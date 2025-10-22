@@ -26,6 +26,11 @@ public class PlateStation : WorkStation
         UpdatePlateStackVisual();
     }
 
+    public bool HasPlates()
+    {
+        return m_plates.Count > 0;
+    }
+
     public void InitializePlateStack(int _n, GameObject _cleanPlatePrefab, GameObject _dirtyPlatePrefab)
     {
         m_plates = new Queue<Plate>();
