@@ -17,8 +17,8 @@ public class Agent : MonoBehaviour
     private List<CookingStation> m_cookingStation;
     private List<CuttingStation> m_cuttingStation;
     private List<TableStation> m_tableStation;
-    private PlateStation m_plateStation;
-    private WashStation m_washStation;
+    private List<PlateStation> m_plateStation;
+    private List<WashStation> m_washStation;
 
     [SerializeField] private NavMeshAgent m_navAgent;
     private KitchenManager m_kitchenManager;
@@ -35,9 +35,9 @@ public class Agent : MonoBehaviour
     public void SetCookingStation(List<CookingStation> _cookingStation) => m_cookingStation = _cookingStation;
     public void SetCuttingStation(List<CuttingStation> _cuttingStation) => m_cuttingStation = _cuttingStation;
     public void SetTableStation(List<TableStation> _tableStation) => m_tableStation = _tableStation;
-    public void SetPlateStation(PlateStation _plateStation) => m_plateStation = _plateStation;
     public void SetKitchenManager(KitchenManager _kitchenManager) => m_kitchenManager = _kitchenManager;
-    public void SetWashStation(WashStation _washStation) => m_washStation = _washStation;
+    public void SetPlateStation(List<PlateStation> _plateStation) => m_plateStation = _plateStation;
+    public void SetWashStation(List<WashStation> _washStation) => m_washStation = _washStation;
 
     /// ---- Methods ----
 
@@ -118,36 +118,34 @@ public class Agent : MonoBehaviour
         // Si l'agent a une assiette sale dans les mains, il va la laver
         if (m_agentMain is Plate plate && !plate.IsClean())
         {
-            // Attendre que la wash station soit libre
-            yield return new WaitUntil(() => !m_washStation.IsLocked());
+            // Attendre qu'une station de lavage soit libre
+            WashStation nearestWash = null;
+            yield return new WaitUntil(() => (nearestWash = FindNearestAvailableStation(m_washStation)) != null);
 
-            m_washStation.LockStation();
+            nearestWash.LockStation();
 
-            MoveTo(m_washStation.transform.position);
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_washStation.transform.position) < 1.5f);
+            MoveTo(nearestWash.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestWash.transform.position) < 1.5f);
 
             m_agentMain = null;
             ShowObjectInHand();
             Debug.Log(m_agentID + " is washing the plate.");
-            yield return StartCoroutine(m_washStation.WashPlate(plate));
-            m_agentMain = m_washStation.GetObject();
+            yield return StartCoroutine(nearestWash.WashPlate(plate));
+            m_agentMain = nearestWash.GetObject(); // Récupère l'assiette propre
             ShowObjectInHand();
         }
 
         // Si l'agent n'a pas d'assiette, il va en chercher une propre
         else if (m_agentMain == null)
         {
-            MoveTo(m_plateStation.transform.position);
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, m_plateStation.transform.position) < 1.5f);
+            PlateStation nearestPlateStation = null;
+            yield return new WaitUntil(() => (nearestPlateStation = FindNearestPlateStation(true)) != null);
 
-            // Attendre qu'une assiette propre soit disponible
-            Plate cleanPlate = null;
-            while (cleanPlate == null)
-            {
-                cleanPlate = m_plateStation.GetPlate();
-                if (cleanPlate == null)
-                    yield return null; // attendre la prochaine frame
-            }
+            MoveTo(nearestPlateStation.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestPlateStation.transform.position) < 1.5f);
+
+            // Attendre qu'une assiette propre soit disponible (la boucle est interne au WaitUntil)
+            Plate cleanPlate = nearestPlateStation.GetPlate();
 
             m_agentMain = cleanPlate;
             ShowObjectInHand();
@@ -344,23 +342,29 @@ public class Agent : MonoBehaviour
         tableStation?.RemovePlate();
         tableStation?.UnlockStation();
 
-        //Nettoyer l'assiette sale et la reposer sur la pile d'assiette
-        m_washStation.LockStation();
+        // 1. Trouver une station de lavage
+        WashStation nearestWash = null;
+        yield return new WaitUntil(() => (nearestWash = FindNearestAvailableStation(m_washStation)) != null);
 
-        MoveTo(m_washStation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_washStation.transform.position) < 1.5f);
+        nearestWash.LockStation();
+
+        MoveTo(nearestWash.transform.position);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestWash.transform.position) < 1.5f);
         m_agentMain = null;
         ShowObjectInHand();
         Debug.Log(m_agentID + " is washing the plate.");
-        yield return StartCoroutine(m_washStation.WashPlate(dirtyPlate));
-        m_agentMain = m_washStation.GetObject();
+        yield return StartCoroutine(nearestWash.WashPlate(dirtyPlate));
+        m_agentMain = nearestWash.GetObject(); // Récupère l'assiette propre
         ShowObjectInHand();
 
-        m_washStation.UnlockStation();
+        nearestWash.UnlockStation(); // WashPlate le fait déjà, mais par sécurité
 
-        MoveTo(m_plateStation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, m_plateStation.transform.position) < 1.5f);
-        m_plateStation.SetPlate(m_agentMain as Plate);
+        // 2. Trouver une station d'assiettes (n'importe laquelle) pour la déposer
+        PlateStation nearestPlateStation = FindNearestPlateStation(false); // false = pas besoin qu'elle ait des assiettes
+
+        MoveTo(nearestPlateStation.transform.position);
+        yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestPlateStation.transform.position) < 1.5f);
+        nearestPlateStation.SetPlate(m_agentMain as Plate);
         m_agentMain = null;
         ShowObjectInHand();
 
@@ -384,6 +388,32 @@ public class Agent : MonoBehaviour
             if (station is CuttingStation cut && cut.IsBusy ) continue;
             if (station is CookingStation cook && (cook.HasCookedIngredient() || cook.IsBusy)) continue;
             if (station is TableStation table && table.IsBusy) continue;
+            if (station is WashStation wash && wash.IsBusy) continue;
+
+            float dist = Vector3.Distance(transform.position, station.transform.position);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearest = station;
+            }
+        }
+        return nearest;
+    }
+
+
+    /// <summary>
+    /// Trouve la PlateStation la plus proche.
+    /// Si mustHavePlates est true, ignore les stations vides.
+    /// </summary>
+    private PlateStation FindNearestPlateStation(bool mustHavePlates = false)
+    {
+        PlateStation nearest = null;
+        float minDist = float.MaxValue;
+        foreach (var station in m_plateStation)
+        {
+            // Si on cherche une assiette et que la station est vide, on l'ignore
+            if (mustHavePlates && !station.HasPlates())
+                continue;
 
             float dist = Vector3.Distance(transform.position, station.transform.position);
             if (dist < minDist)

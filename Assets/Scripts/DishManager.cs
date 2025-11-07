@@ -13,6 +13,7 @@ public class DishManager : MonoBehaviour
     
     public GameObject m_dishBurgerPrefab;
     public GameObject m_dishSaladPrefab;
+    public GameObject m_dishSteakPrefab;
 
     private List<Dish> m_allDishes;
 
@@ -22,7 +23,7 @@ public class DishManager : MonoBehaviour
         m_allDishes = new List<Dish>
         {
             new Dish("Burger", new List<Ingredient> {
-                new Ingredient("Steak", true, true, m_steakPrefab),
+                new Ingredient("Steak", true, false, m_steakPrefab),
                 new Ingredient("Tomato", false, true, m_tomatoPrefab),
                 new Ingredient("Salad", false, true, m_saladPrefab),
                 new Ingredient("Bread", false, false, m_breadPrefab),
@@ -47,13 +48,13 @@ public class DishManager : MonoBehaviour
              m_dishBurgerPrefab
              ),
              new Dish("Steak", new List<Ingredient> {
-                 new Ingredient("Steak", true, true, m_steakPrefab)
+                 new Ingredient("Steak", true, false, m_steakPrefab)
              },
-             m_dishBurgerPrefab
+             m_dishSteakPrefab
              ),
              new Dish ("DoubleBurger", new List<Ingredient> {
-                 new Ingredient("Steak", true, true, m_steakPrefab),
-                 new Ingredient("Steak", true, true, m_steakPrefab),
+                 new Ingredient("Steak", true, false, m_steakPrefab),
+                 new Ingredient("Steak", true, false, m_steakPrefab),
                  new Ingredient("Tomato", false, true, m_tomatoPrefab),
                  new Ingredient("Salad", false, true, m_saladPrefab),
                  new Ingredient("Bread", false, false, m_breadPrefab),

@@ -17,11 +17,11 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private IngredientStation m_steakContainer;
     [SerializeField] private IngredientStation m_onionContainer;
 
-    [SerializeField] private List<CookingStation> m_cookingStation;
-    [SerializeField] private List<CuttingStation> m_cuttingStation;
-    [SerializeField] private List<TableStation> m_tableStation;
-    [SerializeField] private PlateStation m_plateStation;
-    [SerializeField] private WashStation m_washStation;
+    [SerializeField] private List<CookingStation> m_cookingStations;
+    [SerializeField] private List<CuttingStation> m_cuttingStations;
+    [SerializeField] private List<TableStation> m_tableStations;
+    [SerializeField] private List<PlateStation> m_plateStations;
+    [SerializeField] private List<WashStation> m_washStations;
 
     [Header("Prefabs")]
     public GameObject m_cleanPlatePrefab;
@@ -106,7 +106,10 @@ public class KitchenManager : MonoBehaviour
     void Start()
     {
         InitializeOrders();
-        m_plateStation.InitializePlateStack(5, m_cleanPlatePrefab, m_dirtyPlatePrefab);
+        foreach (var plateStation in m_plateStations)
+        {
+            plateStation.InitializePlateStack(5, m_cleanPlatePrefab, m_dirtyPlatePrefab);
+        }
 
         StartCoroutine(StartAgentsNextFrame());
     }
@@ -132,18 +135,18 @@ public class KitchenManager : MonoBehaviour
 
     IEnumerator StartAgentsNextFrame()
     {
-        yield return new WaitUntil(() => m_plateStation.HasPlates());
+        yield return new WaitUntil(() => m_plateStations.Count > 0 && m_plateStations[0].HasPlates());
 
         int j = 0;
         foreach (Agent agent in m_agents)
         {
             agent.SetAgentID(j);
             agent.SetKitchenManager(this);
-            agent.SetCookingStation(m_cookingStation);
-            agent.SetCuttingStation(m_cuttingStation);
-            agent.SetTableStation(m_tableStation);
-            agent.SetPlateStation(m_plateStation);
-            agent.SetWashStation(m_washStation);
+            agent.SetCookingStation(m_cookingStations);
+            agent.SetCuttingStation(m_cuttingStations);
+            agent.SetTableStation(m_tableStations);
+            agent.SetPlateStation(m_plateStations);
+            agent.SetWashStation(m_washStations);
             agent.Work(m_counter);
             j++;
         }
