@@ -159,6 +159,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3cb2c077ad806d4ea7eeb9168d45a45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CookingStation
+  m_progressBarPrefab: {fileID: 0}
+  m_progressBarSlot: {fileID: 0}
   m_kitchenManager: {fileID: 0}
 --- !u!4 &2255138129009317104 stripped
 Transform:

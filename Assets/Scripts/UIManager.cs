@@ -88,6 +88,16 @@ public class UIManager : MonoBehaviour
         {
             // Récupère le sprite du plat par son nom (ex: "Burger", "Salade Composée")
             Sprite dishSprite = GetSpriteByName(_order.GetDish().GetName(), m_dishSprites);
+
+            if (_order.GetDish().GetName() == "Salad" || _order.GetDish().GetName() == "Steak")
+            {
+                RectTransform rt = dishImage.GetComponent<RectTransform>();
+                rt.sizeDelta = new Vector2(100, 100);
+                Vector2 newPos = rt.anchoredPosition;
+                newPos.y = 10f;
+                rt.anchoredPosition = newPos;
+            }
+
             if (dishSprite != null)
             {
                 dishImage.sprite = dishSprite;

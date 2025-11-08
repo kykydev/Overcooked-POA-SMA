@@ -56,7 +56,7 @@ public class DishManager : MonoBehaviour
              //    new Ingredient("Steak", true, false, m_steakPrefab)
              //},
              //m_dishSteakPrefab
-             //),
+             //)
              //new Dish ("DoubleBurger", new List<Ingredient> {
              //    new Ingredient("Steak", true, false, m_steakPrefab),
              //    new Ingredient("Steak", true, false, m_steakPrefab),
