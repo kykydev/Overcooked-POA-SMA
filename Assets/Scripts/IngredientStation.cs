@@ -5,8 +5,15 @@ public class IngredientStation : WorkStation
 {
     /// --- Attributes ---
     private Queue<Ingredient> m_ingredients = new Queue<Ingredient>();
+    private Animator m_animator;
+    private static readonly int OpenHash = Animator.StringToHash("Open");
 
     /// --- Methods ---
+    /// 
+    public void Awake()
+    {
+        m_animator = GetComponentInChildren<Animator>();
+    }
 
     /// <summary>
     /// Dépile l'ingrédient présent dans la station.
@@ -15,6 +22,7 @@ public class IngredientStation : WorkStation
     {
         if (m_ingredients.Count == 0)
             return null;
+        m_animator.SetTrigger(OpenHash);
         return m_ingredients.Dequeue();
     }
 
