@@ -23,7 +23,6 @@ public class Ingredient
         m_needsCooking = _needsCooking;
         m_needsCutting = _needsCutting;
         m_prefab = _prefab;
-
     }
 
     /// --- Getters ---

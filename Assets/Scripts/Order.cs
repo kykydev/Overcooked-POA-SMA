@@ -20,7 +20,7 @@ public class Order
         m_reward = _reward;
     }
 
-    /// --- Plate&Order Assignment State ---
+    /// --- Plate & Order Assignment State ---
     private bool m_isPlateBeingAssigned = false;
     public bool IsPlateBeingAssigned() => m_isPlateBeingAssigned;
     public void SetPlateBeingAssigned(bool value) => m_isPlateBeingAssigned = value;
@@ -28,7 +28,6 @@ public class Order
     private bool m_isBeingDelivered = false;
     public bool IsBeingDelivered() => m_isBeingDelivered;
     public void SetBeingDelivered(bool value) => m_isBeingDelivered = value;
-
 
     /// --- Getters ---
     public string GetOrderId() => m_orderId;
@@ -44,6 +43,5 @@ public class Order
     public void SetReward(int _newReward) => m_reward = _newReward;
     public void SetPlate(Plate _plate) => m_plate = _plate;
     public void SetTableStation(TableStation _tableStation) => m_tableStation = _tableStation;
-
 
 }

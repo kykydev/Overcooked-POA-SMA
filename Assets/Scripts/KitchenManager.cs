@@ -5,6 +5,11 @@ using UnityEngine;
 public class KitchenManager : MonoBehaviour
 {
     /// --- Attributes ---
+    [Header("UI")]
+    [SerializeField] private UIManager m_uiManager;
+    private int m_totalMoney = 0;
+    private float m_gameTimer = 300f;
+
     [Header("Scene References")]
     [SerializeField] private List<Agent> m_agents;
     [SerializeField] private Counter m_counter;
@@ -34,6 +39,7 @@ public class KitchenManager : MonoBehaviour
     /// --- Getters ---
     public List<Order> GetCurrentOrders() => m_currentOrders;
 
+
     /// <summary>
     /// Retourne le prochain ingrédient disponible dans la liste des commandes en cours. Le parcours se fait dans l'ordre des commandes.
     /// </summary>
@@ -48,6 +54,7 @@ public class KitchenManager : MonoBehaviour
         }
         return null;
     }
+
 
     /// <summary>
     /// Ajoute une commande à la liste des commandes en cours et initialise les ingrédients nécessaires en les affectant aux stations appropriées. 
@@ -96,6 +103,8 @@ public class KitchenManager : MonoBehaviour
         _order.GetIngredientQueue().Clear();
         foreach (var ing in ingredientQueue)
             _order.GetIngredientQueue().Enqueue(ing);
+
+        m_uiManager.AddOrderToUI(_order);
     }
 
 
@@ -111,12 +120,36 @@ public class KitchenManager : MonoBehaviour
             plateStation.InitializePlateStack(5, m_cleanPlatePrefab, m_dirtyPlatePrefab);
         }
 
+        m_counter.SetKitchenManager(this);
+
         StartCoroutine(StartAgentsNextFrame());
+
+        m_uiManager.RefreshOrderLayoutAfterInitialization();
     }
 
+
+    /// <summary>
+    /// Met à jour le minuteur de jeu.
+    /// </summary>
+    void Update()
+    {
+        if (m_gameTimer > 0)
+        {
+            m_gameTimer -= Time.deltaTime;
+        }
+        else
+        {
+            m_gameTimer = 0;
+        }
+    }
+
+
+    /// <summary>
+    /// Initialise une série de commandes aléatoires au début du jeu.
+    /// </summary>
     void InitializeOrders()
     {
-        int n = 10;
+        int n = 20;
         List<Dish> randomDishes = m_dishManager.GetRandomDishes(n);
 
         int i = 0;
@@ -133,6 +166,11 @@ public class KitchenManager : MonoBehaviour
             Debug.Log("Order ID: " + order.GetOrderId());
     }
 
+
+    /// <summary>
+    /// Démarre les agents au frame suivant, une fois que les stations d'assiettes ont des assiettes disponibles.
+    /// </summary>
+    /// <returns></returns>
     IEnumerator StartAgentsNextFrame()
     {
         yield return new WaitUntil(() => m_plateStations.Count > 0 && m_plateStations[0].HasPlates());
@@ -162,14 +200,46 @@ public class KitchenManager : MonoBehaviour
         return m_currentOrders.Count > 0;
     }
 
+
     /// <summary>
     /// Retire une commande de la liste des commandes en cours.
     /// </summary>
     /// <param name="order"></param>
     public void RemoveOrder(Order _order)
     {
+        m_uiManager.RemoveOrderFromUI(_order);
+
         if (m_currentOrders.Contains(_order))
             m_currentOrders.Remove(_order);
+    }
+
+
+    /// <summary>
+    /// Ajoute de l'argent au score total de la cuisine.
+    /// </summary>
+    /// <param name="_amount"></param>
+    public void AddMoney(int _amount)
+    {
+        m_totalMoney += _amount;
+        // On pourrait déclencher un événement ici, mais pour l'instant on garde simple
+    }
+
+
+    /// <summary>
+    /// Permet à l'UI de lire le score actuel.
+    /// </summary>
+    public int GetTotalMoney()
+    {
+        return m_totalMoney;
+    }
+
+
+    /// <summary>
+    /// Permet à l'UI de lire le temps restant.
+    /// </summary>
+    public float GetGameTimer()
+    {
+        return m_gameTimer;
     }
 
 }

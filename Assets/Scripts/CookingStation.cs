@@ -7,6 +7,11 @@ public class CookingStation : WorkStation
     [SerializeField] private KitchenManager m_kitchenManager;
 
     /// --- Methods ---
+
+    /// <summary>
+    /// Cuit l'ingrédient passé en paramètre après un certain temps, change le prefab et le rajoute à la queue d'ingrédients de la commande.
+    /// </summary>
+    /// <param name="_ingredient"></param>  
     public IEnumerator CookIngredient(Ingredient _ingredient)
     {
         if (_ingredient == null)
@@ -28,10 +33,16 @@ public class CookingStation : WorkStation
         UnlockStation();
     }
 
+
+    /// <summary>
+    /// Vérifie si l'ingrédient actuellement sur la station est cuit.
+    /// </summary>
+    /// <returns></returns>
     public bool HasCookedIngredient()
     {
         object current = PeekObject();
         return current is Ingredient ingredient &&
                ingredient.GetCookingState() == IngredientCookingState.Cooked;
     }
+
 }

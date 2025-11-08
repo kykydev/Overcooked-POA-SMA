@@ -1,19 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem.Android;
-using UnityEngine.UI;
-using UnityEngineInternal;
 
 public class Agent : MonoBehaviour
 {
     /// --- Attributes ---
+    [Header("AgentDescription")]
     private int m_agentID;
     private string m_agentName;
     private object m_agentMain;
 
+    [Header("WorkStations")]
     private List<CookingStation> m_cookingStation;
     private List<CuttingStation> m_cuttingStation;
     private List<TableStation> m_tableStation;
@@ -60,6 +58,7 @@ public class Agent : MonoBehaviour
         StartCoroutine(WorkRoutine(_counter));
     }
 
+
     /// <summary>
     /// Routine de travail principale de l'agent.
     /// </summary>
@@ -69,6 +68,15 @@ public class Agent : MonoBehaviour
     {
         while (true)
         {
+            if (m_agentMain is Plate plate && !plate.IsClean())
+            {
+                //Exécute la 1ère partie (laver l'assiette) et s'arrêter
+                yield return StartCoroutine(FetchAndAssignPlate(null));
+
+                // L'assiette est lavée et rangée
+                continue;
+            }
+
             //Trouver le prochain ingrédient disponible
             Ingredient nextIngredient = m_kitchenManager.GetNextAvailableIngredient();
 
@@ -133,6 +141,18 @@ public class Agent : MonoBehaviour
             yield return StartCoroutine(nearestWash.WashPlate(plate));
             m_agentMain = nearestWash.GetObject(); // Récupère l'assiette propre
             ShowObjectInHand();
+
+            // L'assiette est propre, il faut la ranger.
+            PlateStation nearestPlateStation = FindNearestPlateStation(false);
+            MoveTo(nearestPlateStation.transform.position);
+            yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestPlateStation.transform.position) < 1.5f);
+
+            nearestPlateStation.SetPlate(m_agentMain as Plate);
+            m_agentMain = null; // Agent a les mains libres
+            ShowObjectInHand();
+
+            // La tâche de lavage est finie, on sort de la coroutine.
+            yield break;
         }
 
         // Si l'agent n'a pas d'assiette, il va en chercher une propre
@@ -169,7 +189,6 @@ public class Agent : MonoBehaviour
             }
         }
     }
-
 
 
     /// <summary>
@@ -337,39 +356,10 @@ public class Agent : MonoBehaviour
         ShowObjectInHand();
         Debug.Log(m_agentID + " picked up new dirty plate.");
 
-        // Enlever l'assiette de la table
+        // Enlever l'assiette de la table (c'est bon de garder ça)
         var tableStation = _order.GetTableStation();
         tableStation?.RemovePlate();
         tableStation?.UnlockStation();
-
-        // 1. Trouver une station de lavage
-        WashStation nearestWash = null;
-        yield return new WaitUntil(() => (nearestWash = FindNearestAvailableStation(m_washStation)) != null);
-
-        nearestWash.LockStation();
-
-        MoveTo(nearestWash.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestWash.transform.position) < 1.5f);
-        m_agentMain = null;
-        ShowObjectInHand();
-        Debug.Log(m_agentID + " is washing the plate.");
-        yield return StartCoroutine(nearestWash.WashPlate(dirtyPlate));
-        m_agentMain = nearestWash.GetObject(); // Récupère l'assiette propre
-        ShowObjectInHand();
-
-        nearestWash.UnlockStation(); // WashPlate le fait déjà, mais par sécurité
-
-        // 2. Trouver une station d'assiettes (n'importe laquelle) pour la déposer
-        PlateStation nearestPlateStation = FindNearestPlateStation(false); // false = pas besoin qu'elle ait des assiettes
-
-        MoveTo(nearestPlateStation.transform.position);
-        yield return new WaitUntil(() => Vector3.Distance(transform.position, nearestPlateStation.transform.position) < 1.5f);
-        nearestPlateStation.SetPlate(m_agentMain as Plate);
-        m_agentMain = null;
-        ShowObjectInHand();
-
-        // Retirer la commande du KitchenManager
-        m_kitchenManager.RemoveOrder(_order);
     }
 
 
@@ -426,7 +416,6 @@ public class Agent : MonoBehaviour
     }
 
 
-
     /// <summary>
     /// Affiche l'objet que l'agent tient dans sa main.
     /// </summary>
@@ -455,6 +444,5 @@ public class Agent : MonoBehaviour
             plateObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
     }
-
 
 }

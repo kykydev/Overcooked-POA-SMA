@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 public class Dish
 {
-
     /// --- Attributes ---
     public string m_name;
     public List<Ingredient> m_recipe;

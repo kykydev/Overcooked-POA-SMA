@@ -66,8 +66,8 @@
     <Compile Include="Assets\Scripts\Workstation.cs" />
     <Compile Include="Assets\Scripts\IngredientStation.cs" />
     <Compile Include="Assets\Scripts\Agent.cs" />
-    <Compile Include="Assets\Scripts\AssemblyStation.cs" />
     <Compile Include="Assets\Scripts\Counter.cs" />
+    <Compile Include="Assets\Scripts\UIManager.cs" />
     <Compile Include="Assets\Scripts\TableStation.cs" />
     <Compile Include="Assets\Scripts\CuttingStation.cs" />
     <Compile Include="Assets\Scripts\KitchenManager.cs" />

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class WorkStation : MonoBehaviour {
@@ -12,7 +11,7 @@ public abstract class WorkStation : MonoBehaviour {
     public void UnlockStation() => IsBusy = false;
     public bool IsLocked() => IsBusy;
 
-    /// --- Getters/Setters ---
+    /// --- Getters ---
     public object GetObject()
     {
         var tmp = m_object;
@@ -21,17 +20,21 @@ public abstract class WorkStation : MonoBehaviour {
         return tmp;
     }
 
-    public void SetObject(object obj)
-    {
-        m_object = obj;
-    }
-
     public object PeekObject()
     {
         return m_object;
     }
 
-    /// --- Display Methods ---
+    /// --- Setters ---
+    public void SetObject(object obj)
+    {
+        m_object = obj;
+    }
+
+    /// <summary>
+    /// Permet d'afficher un objet (Ingredient, Dish ou Plate) sur la station de travail.
+    /// </summary>
+    /// <param name="_obj"></param>
     public void ShowObjectOnStation(object _obj)
     {
         Transform slotTransform = transform.Find("Slot");
@@ -57,4 +60,5 @@ public abstract class WorkStation : MonoBehaviour {
             plateObj.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         }
     }
+
 }

@@ -3,27 +3,42 @@
 public class TableStation : WorkStation {
 
     /// --- Attributes ---
-    public Plate CurrentPlate;
+    public Plate m_currentPlate;
 
+    /// --- Methods ---
+
+    /// <summary>
+    /// Assigne une assiette à une commande et lui assigne cette station comme contenaire.
+    /// </summary>
+    /// <param name="_order"></param> <param name="_plate"></param>
     public void AssignPlateToOrder(Plate _plate, Order _order)
     {
-        CurrentPlate = _plate;
+        m_currentPlate = _plate;
         _plate.SetContainer(this);
         _order.SetPlate(_plate);
         _order.SetTableStation(this);
-        ShowObjectOnStation(CurrentPlate);
+        ShowObjectOnStation(m_currentPlate);
     }
 
-    public Plate GetPlate() => CurrentPlate;
+
+    /// <summary>
+    /// Récupère l'assiette présente sur la table.
+    /// </summary>
+    /// <returns></returns>
+    public Plate GetPlate() => m_currentPlate;
     public void RemovePlate()
     {
-        CurrentPlate = null;
-        ShowObjectOnStation(CurrentPlate);
+        m_currentPlate = null;
+        ShowObjectOnStation(m_currentPlate);
     }
 
+
+    /// <summary>
+    /// Met à jour la visualisation des ingrédients sur l'assiette.
+    /// </summary>
     public void UpdatePlateVisual()
     {
-        if (CurrentPlate == null)
+        if (m_currentPlate == null)
             return;
 
         Transform slot = transform.Find("Slot");
@@ -47,7 +62,7 @@ public class TableStation : WorkStation {
         }
 
         float height = 0.05f;
-        foreach (Ingredient ing in CurrentPlate.GetIngredients())
+        foreach (Ingredient ing in m_currentPlate.GetIngredients())
         {
             if (ing == null || ing.GetPrefab() == null)
                 continue;
@@ -63,4 +78,5 @@ public class TableStation : WorkStation {
             height += 0.30f;
         }
     }
-    }
+
+}

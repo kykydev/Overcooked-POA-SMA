@@ -5,24 +5,19 @@ public class Counter : MonoBehaviour
 {
     /// --- Attributes ---
     private Queue<Order> m_orders = new Queue<Order>();
+    private KitchenManager m_kitchenManager;
+
+    /// --- Setters ---
+    public void SetKitchenManager(KitchenManager _kitchenManager) => m_kitchenManager = _kitchenManager;
 
     /// --- Methods ---
-    //Retourne la prochaine commande dans la file d’attente
-    public Order GiveOrder()
-    {
-        return m_orders.Dequeue();
-    }
 
-    //Ajouter une nouvelle commande à la file d’attente
-    public void AddOrder(Order _newOrder)
-    {
-        m_orders.Enqueue(_newOrder);
-    }
-
-    //Recevoir un plat d’un agent et le valider si il correspond a la commande en cours
+    /// <summary>
+    /// Permet de recevoir une commande et de vérifier si le plat livré correspond à la commande. Puis, ajoute l'argent à la caisse si la commande est correcte.
+    /// </summary>
+    /// <param name="_dish"></param> <param name="_order"></param>
     public void ReceiveOrder(Order _order, Dish _dish)
     {
-        // Vérifie le nom et la composition du plat
         bool sameName = _order.GetDish().GetName() == _dish.GetName();
 
         List<Ingredient> expected = _order.GetDish().GetRecipe();
@@ -33,7 +28,7 @@ public class Counter : MonoBehaviour
 
         if (sameCount)
         {
-            // Copie pour gérer les doublons
+            m_kitchenManager.AddMoney(_order.GetReward());
             List<Ingredient> expectedCopy = new List<Ingredient>(expected);
             foreach (Ingredient ing in delivered)
             {
@@ -51,6 +46,5 @@ public class Counter : MonoBehaviour
             sameIngredients = false;
         }
     }
-
 
 }
