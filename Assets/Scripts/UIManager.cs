@@ -77,7 +77,7 @@ public class UIManager : MonoBehaviour
     /// <param name="_order"></param>
     public void AddOrderToUI(Order _order)
     {
-        if (m_activeOrderUIs.Count >= 10 || m_activeOrderUIs.ContainsKey(_order))
+        if (m_activeOrderUIs.Count >= 20 || m_activeOrderUIs.ContainsKey(_order))
             return;
 
         GameObject newTicket = Instantiate(m_orderTicketPrefab, m_orderListContainer);
