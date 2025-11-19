@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Dish.cs" />
+    <Compile Include="Assets\Scripts\ExperimentManager.cs" />
     <Compile Include="Assets\Scripts\CookingStation.cs" />
     <Compile Include="Assets\Scripts\Workstation.cs" />
     <Compile Include="Assets\Scripts\IngredientStation.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Assets\Scripts\DishManager.cs" />
     <Compile Include="Assets\Scripts\Plate.cs" />
     <Compile Include="Assets\Scripts\Ingredient.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Order.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1294,12 +1296,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.ShaderGraph.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Editor.Shared">
-      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.Shared.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.2D.Sprite.AIIntegration.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.AIIntegration.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.RenderPipelines.Core.Editor.Shared">
+      <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.Editor.Shared.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InputSystem">

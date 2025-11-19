@@ -271,18 +271,28 @@ public class Agent : MonoBehaviour
             }
         }
 
-        // Vérification et assignation de l’assiette à la commande
+        // 1. Si une assiette est en cours d'assignation par un autre agent, on attend qu'elle soit prête.
+        if (ingredientOrder.IsPlateBeingAssigned())
+        {
+            // Debug.Log(m_agentID + " waiting for plate to be assigned to " + ingredientOrder.GetOrderId());
+            yield return new WaitUntil(() => ingredientOrder.GetTableStation() != null && ingredientOrder.GetTableStation().GetPlate() != null);
+        }
+
+        // 2. On récupère les références (maintenant qu'on a potentiellement attendu)
         var tableStation = ingredientOrder.GetTableStation();
         var plate = tableStation?.GetPlate();
 
         if (plate == null)
         {
-            // Si pas d'assiette assignée, en chercher une
+            // 3. Si vraiment personne ne s'en occupe, alors on va en chercher une nous-même
             yield return StartCoroutine(FetchAndAssignPlate(ingredientOrder));
+
+            // On met à jour les références après l'avoir posée
             tableStation = ingredientOrder.GetTableStation();
             plate = tableStation?.GetPlate();
         }
 
+        // 4. Vérification finale de sécurité
         if (tableStation == null || plate == null)
         {
             Debug.LogWarning("No table or plate available for ingredient order: " + ingredientOrder.GetOrderId());

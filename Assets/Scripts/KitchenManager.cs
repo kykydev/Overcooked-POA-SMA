@@ -8,10 +8,10 @@ public class KitchenManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private UIManager m_uiManager;
     private int m_totalMoney = 0;
-    private float m_gameTimer = 300f;
+    public float m_gameTimer = 300f;
 
     [Header("Scene References")]
-    [SerializeField] private List<Agent> m_agents;
+    public List<Agent> m_agents;
     [SerializeField] private Counter m_counter;
     [SerializeField] private DishManager m_dishManager;
 
@@ -122,8 +122,6 @@ public class KitchenManager : MonoBehaviour
 
         m_counter.SetKitchenManager(this);
 
-        StartCoroutine(StartAgentsNextFrame());
-
         m_uiManager.RefreshOrderLayoutAfterInitialization();
     }
 
@@ -157,7 +155,8 @@ public class KitchenManager : MonoBehaviour
         {
             string orderId = dish.GetName() + "_" + i;
             i++;
-            Order order = new Order(orderId, dish, 15);
+            int money = dish.GetRecipe().Count * 1;
+            Order order = new Order(orderId, dish, money);
             AddOrder(order);
         }
 
@@ -171,7 +170,7 @@ public class KitchenManager : MonoBehaviour
     /// Démarre les agents au frame suivant, une fois que les stations d'assiettes ont des assiettes disponibles.
     /// </summary>
     /// <returns></returns>
-    IEnumerator StartAgentsNextFrame()
+    public IEnumerator StartAgentsNextFrame()
     {
         yield return new WaitUntil(() => m_plateStations.Count > 0 && m_plateStations[0].HasPlates());
 
