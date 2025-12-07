@@ -10,11 +10,15 @@ public class DishManager : MonoBehaviour
     public GameObject m_saladPrefab;
     public GameObject m_breadPrefab;
     public GameObject m_onionPrefab;
+    public GameObject m_chickenPrefab;
+    public GameObject m_sausagePrefab;
 
     [Header("DishPrefabs")]
     public GameObject m_dishBurgerPrefab;
     public GameObject m_dishSaladPrefab;
     public GameObject m_dishSteakPrefab;
+    public GameObject m_dishChickenSandwichPrefab;
+    public GameObject m_dishHotdogPrefab;
 
     private List<Dish> m_allDishes;
 
@@ -43,6 +47,20 @@ public class DishManager : MonoBehaviour
 
              },
              m_dishSaladPrefab
+             ),
+             new Dish("ChickenSandwich", new List<Ingredient> {
+                 new Ingredient("Chicken", true, false, m_chickenPrefab),
+                 new Ingredient("Onion", false, true, m_onionPrefab),
+                 new Ingredient("Salad", false, true, m_saladPrefab),
+                 new Ingredient("Bread", false, false, m_breadPrefab)
+             },
+             m_dishChickenSandwichPrefab
+             ),
+             new Dish("Hotdog", new List<Ingredient> {
+                 new Ingredient("Sausage", true, false, m_sausagePrefab),
+                 new Ingredient("Bread", false, false, m_breadPrefab)
+             },
+             m_dishHotdogPrefab
              )
              //new Dish("VeganBurger", new List<Ingredient> {
              //    new Ingredient("Tomato", false, true, m_tomatoPrefab),

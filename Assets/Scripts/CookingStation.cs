@@ -23,7 +23,12 @@ public class CookingStation : WorkStation
         yield return new WaitForSeconds(5f);
 
         _ingredient.SetCookingIngredientState(IngredientCookingState.Cooked);
-        _ingredient.SetPrefab(m_kitchenManager.m_steakCuitPrefab);
+        if(_ingredient.GetName() == "Steak")
+            _ingredient.SetPrefab(m_kitchenManager.m_steakCuitPrefab);
+        else if (_ingredient.GetName() == "Chicken")
+            _ingredient.SetPrefab(m_kitchenManager.m_chickenCuitPrefab);
+        else if (_ingredient.GetName() == "Sausage")
+            _ingredient.SetPrefab(m_kitchenManager.m_sausageCuitPrefab);
         ShowObjectOnStation(_ingredient);
         Debug.Log($"{_ingredient.GetName()} is cooked and ready to get picked up!");
 

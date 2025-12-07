@@ -21,6 +21,9 @@ public class KitchenManager : MonoBehaviour
     [SerializeField] private IngredientStation m_breadContainer;
     [SerializeField] private IngredientStation m_steakContainer;
     [SerializeField] private IngredientStation m_onionContainer;
+    [SerializeField] private IngredientStation m_sausageContainer;
+    [SerializeField] private IngredientStation m_chickenContainer;
+
 
     [SerializeField] private List<CookingStation> m_cookingStations;
     [SerializeField] private List<CuttingStation> m_cuttingStations;
@@ -32,6 +35,8 @@ public class KitchenManager : MonoBehaviour
     public GameObject m_cleanPlatePrefab;
     public GameObject m_dirtyPlatePrefab;
     public GameObject m_steakCuitPrefab;
+    public GameObject m_chickenCuitPrefab;
+    public GameObject m_sausageCuitPrefab;
 
     /// --- Current Order Management ---
     private List<Order> m_currentOrders = new List<Order>();
@@ -95,6 +100,14 @@ public class KitchenManager : MonoBehaviour
                     ing.SetContainer(m_onionContainer);
                     m_onionContainer.SetIngredient(ing);
                     break;
+                case "Sausage":
+                    ing.SetContainer(m_sausageContainer);
+                    m_sausageContainer.SetIngredient(ing);
+                    break;
+                case "Chicken":
+                    ing.SetContainer(m_chickenContainer);
+                    m_chickenContainer.SetIngredient(ing);
+                    break;
             }
 
             ingredientQueue.Enqueue(ing);
@@ -155,14 +168,32 @@ public class KitchenManager : MonoBehaviour
         {
             string orderId = dish.GetName() + "_" + i;
             i++;
-            int money = dish.GetRecipe().Count * 1;
+
+            int ingredientsSum = 0;
+            List<Ingredient> recipe = dish.GetRecipe();
+
+            foreach (Ingredient ing in recipe)
+            {
+                int ingPrice = 1;
+
+                if (ing.GetNeedsCutting())
+                    ingPrice += 1;
+
+                if (ing.GetNeedsCooking())
+                    ingPrice += 1;
+
+                ingredientsSum += ingPrice;
+            }
+
+            int money = ingredientsSum + recipe.Count;
+
             Order order = new Order(orderId, dish, money);
             AddOrder(order);
         }
 
         Debug.Log("Initialized " + n + " orders.");
         foreach (Order order in m_currentOrders)
-            Debug.Log("Order ID: " + order.GetOrderId());
+            Debug.Log("Order ID: " + order.GetOrderId() + " | Reward: " + order.GetReward());
     }
 
 
